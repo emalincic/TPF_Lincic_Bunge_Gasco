@@ -7,7 +7,7 @@ import pygame
 class Lawnmower(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        image = pygame.image.load('Zombies/lawnmower.png').convert_alpha()
+        image = pygame.image.load('Zombies/images/lawnmower.png').convert_alpha()
         self.image = pygame.transform.scale(image, (70, 50))
         self.rect = self.image.get_rect(center=(x,y))
         self.speed = 0
