@@ -8,7 +8,7 @@ from pygame.locals import RLEACCEL
 pygame.init()
 
 # Creamos ventana
-dims = (800, 600)
+dims = (1200, 600)
 screen = pygame.display.set_mode(dims)
 pygame.display.set_caption('Plants vs Zombies')
 
@@ -22,20 +22,16 @@ pygame.time.set_timer(SUN_EVENT, 5000)
 # Grupo de soles
 soles = pygame.sprite.Group()
 
-# Clase Lawnmower
-class Lawnmower(pygame.sprite.Sprite):
-    def __init__(self, image_file, dims=(800, 600)):
-        super(Lawnmower, self).__init__()
-        non_dimmed = pygame.image.load(image_file).convert_alpha()
-        self.image = pygame.transform.scale(non_dimmed, (45, 45))
+
 
 
 # ========================
 # MENÚ PRINCIPAL
 # ========================
 def main_menu():
-    font = pygame.font.SysFont("arial", 50)
-    button_rect = pygame.Rect(300, 250, 200, 60)
+    font = pygame.font.SysFont("impact", 50)
+    button_rect = pygame.Rect(600, 450, 200, 60)
+    button_config = pygame.Rect(250, 480, 350, 60)
     clicked = False
 
     while not clicked:
@@ -46,15 +42,22 @@ def main_menu():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if button_rect.collidepoint(event.pos):
                     clicked = True
-
-        screen.fill((34, 177, 76))  # Fondo verde
-
+    
+         
+        fondo = pygame.image.load("Images/pvz_udesa.jpeg").convert()
+        fondo = pygame.transform.scale(fondo, dims)  # opcional: adapta la imagen al tamaño de la pantalla
+        screen.blit(fondo, (0, 0))
         title_text = font.render("Plants vs Zombies", True, (255, 255, 255))
         play_text = font.render("Jugar", True, (0, 0, 0))
-
+        config_text = font.render("Configuracion", True, (0, 0, 0))
         screen.blit(title_text, (200, 100))
         pygame.draw.rect(screen, (255, 255, 0), button_rect)  # Botón amarillo
         screen.blit(play_text, (button_rect.x + 40, button_rect.y + 5))
+        
+
+        pygame.draw.rect(screen, (150, 255, 0), button_config)  
+        screen.blit(config_text, (button_config.x + 10, button_config.y ))
+        
 
         pygame.display.flip()
 
@@ -80,9 +83,21 @@ while run:
                     sun_counter += sol.grab()
 
     soles.update()
-    screen.fill((0, 0, 0))
-    screen.blit(mapa.image, mapa.rect)
+    ##screen.fill((0, 0, 0))
+    ##screen.blit(mapa.image, mapa.rect)
 
+    screen.fill((50, 120, 50))  # Fondo verde (opcional)
+
+    # Dibujar grilla 9x5
+    cols = 10
+    rows = 6
+    cell_width = dims[0] // cols   # 1200 / 9 = 133
+    cell_height = dims[1] // rows  # 600 / 5 = 120
+
+    for i in range(cols):
+        for j in range(rows):
+            rect = pygame.Rect(i * cell_width, j * cell_height, cell_width, cell_height)
+            pygame.draw.rect(screen, (0, 100, 0), rect, 2)  # Borde verde oscuro
     for sol in soles:
         sol.action()
         screen.blit(sol.image, sol.rect)
@@ -90,4 +105,4 @@ while run:
     print(sun_counter)
     pygame.display.update()
 
-pygame.quit()
+pygame.quit() 
