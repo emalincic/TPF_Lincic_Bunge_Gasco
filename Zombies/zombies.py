@@ -9,13 +9,15 @@ h = 800
 class Zombies(pygame.sprite.Sprite):
     def __init__(self, zombie_type):
         super(Zombies, self).__init__()
+        self.zombie_type = zombie_type
         self.health = zombie_type['health']
         self.speed = zombie_type['speed']
-        self.image = zombie_type['image']
+        self.image = zombie_type['image'][0]
         self.probability = zombie_type['probability']
+        self.max_health = zombie_type['health']
         self.hability = None
         
-        if Zombie_types.get('hability') is not None:
+        if Zombie_types.get('ability') is not None:
             hability_class = globals()[self.zombie_type["habilidad"]]
             self.hability = hability_class(self)
         
@@ -35,6 +37,16 @@ class Zombies(pygame.sprite.Sprite):
             exit()
     def selfdamage(self, damage=50):
         self.health -= damage
+        if self.health < self.max_health*0.4:
+            try:
+                self.image = self.zombie_type['image'][1]
+            except:
+                self.image = self.zombie_type['image'][0]
+            image = pygame.image.load(self.image).convert_alpha()
+            self.surf = pygame.transform.scale(image, (100, 90))
+
+            x, y = self.rect.topleft
+            self.rect = self.surf.get_rect(topleft=(x, y))
         if self.health <= 0:
             self.kill()
 def sprites():

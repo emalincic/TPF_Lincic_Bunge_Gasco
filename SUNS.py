@@ -1,5 +1,26 @@
 import random
 import pygame
+
+def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
+    if key == 'plant':
+        cell_width = dims[0] // cols
+        cell_height = dims[1] // rows
+        col = pos[0] // cell_width
+        row = pos[1] // cell_height
+
+        center_x = col * cell_width + cell_width // 2
+        center_y = row * cell_height + cell_height // 2
+        return (center_x, center_y)
+    elif key == 'sun':
+        cell_width = dims[0] // cols
+        cell_height = dims[1] // rows
+        # Elegimos columnas 1 a 9 y filas 1 a 5 (ignoramos la fila y columna 0)
+        col = random.randint(1, cols - 1)   # 1 a 9
+        row = random.randint(1, rows - 1)   # 1 a 5
+
+
+    
+
 # Clase soles
 class Suns(pygame.sprite.Sprite):
     def __init__(self, image_file, dims=(1200, 600), value=50):

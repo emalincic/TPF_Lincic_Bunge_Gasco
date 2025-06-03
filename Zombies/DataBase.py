@@ -2,29 +2,29 @@ Zombie_types = {
     'Normal': {
         'health': 190,
         'speed': 0.5,
-        'image': 'Zombies/images/zombie_normal.png',
+        'image': ['Images\zombie_normal.png'],
         'probability': 0.8,
-        'hability': None
+        'ability': None
     },
     'Cone' : {
         'health': 560,
         'speed': 0.5,
-        'image': 'Zombies/images/mati_zomcaccia.png',
+        'image': ['Images\mati_zomcaccia.png'],
         'probability': 0.4,
-        'hability': None
+        'ability': None
     },
     'bucket' : {
         'health': 1290,
         'speed': 0.5,
-        'image': 'Zombies/images/zombie_bucket.png',
+        'image': ['Images\zombie_bucket.png'],
         'probability': 0.35,
-        'hability': None
+        'ability': None
     },
     'balloon' : {
         'health': 900,
         'speed': 0.75,
-        'image': 'Zombies/images/Balloonzombie.png',
+        'image': ['Images\Balloonzombie.png', 'Images\Balloonzombie2.png'],
         'probability': 0.2,
-        'hability': None
+        'ability': None
     }
 }

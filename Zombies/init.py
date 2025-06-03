@@ -21,7 +21,7 @@ def initialization_of_game():
                 pygame.quit()
                 exit()
         try:
-            background = pygame.image.load('Zombies/images/mapa_pvz.png').convert()
+            background = pygame.image.load('Images\mapa_pvz.png').convert()
             background = pygame.transform.scale(background, (w, h))
         except pygame.error as e:
             print(f"No se pudo cargar la imagen de fondo: {e}") 
