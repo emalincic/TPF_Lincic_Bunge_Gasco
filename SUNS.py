@@ -64,13 +64,12 @@ class Suns(pygame.sprite.Sprite):
         self.kill()
         return self.value
 
-class Plants(pygame.sprite.Sprite):
-    def __init__(self, imgae_file, start_position, dims = (800, 600), cost = 50):
-        super(Plants, self).__init__()
-        non_dimmed = pygame.image.load(imgae_file).convert_alpha()
-        self.image = pygame.transform.scale(non_dimmed, (80, 80))
-        self.pos = start_position
-        self.rect = self.image.get_rect(center=start_position)
-        self.cost = cost
-        self.state = True
 
+
+
+
+
+class SF_sun(Suns):
+    def __init__(self, image_file, start_pos, fpy, value=50):
+        super().__init__(image_file, start_pos, fpy, value)
+    
