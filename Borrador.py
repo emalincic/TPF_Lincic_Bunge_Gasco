@@ -9,7 +9,7 @@ from DataBase import Zombie_types
 
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
-    def __init__(self, image_file, pos, dims = (800, 600), cost = 50, life = 100):
+    def __init__(self, image_file, pos, dims = (800, 600), cost = 50, life = 300):
         super(Plants, self).__init__()
         non_dimmed = pygame.image.load(image_file).convert_alpha()
         self.image = pygame.transform.scale(non_dimmed, (80, 80))
@@ -27,7 +27,7 @@ class Plants(pygame.sprite.Sprite):
         return int(self.cost/2)
 
 class Sunflower(Plants):
-    def __init__(self, image_file, pos, dims=(800, 600), cost=50, life = 100):
+    def __init__(self, image_file, pos, dims=(800, 600), cost=50, life = 300):
         super().__init__(image_file, pos, dims, cost, life)
     def ability(self):
         if self.ready == None:
@@ -39,12 +39,12 @@ class Sunflower(Plants):
             self.ready = None
 
 class Nut(Plants):
-    def __init__(self, image_file, pos, dims=(800, 600), cost=50, life=200):
+    def __init__(self, image_file, pos, dims=(800, 600), cost=50, life=4000):
         super().__init__(image_file, pos, dims, cost, life)
     def ability(self): return None
 
 class PeaShotter(Plants):
-    def __init__(self, image_file, pos, pea_file, dims=(800, 600), cost=50, life=100):
+    def __init__(self, image_file, pos, pea_file, dims=(800, 600), cost=50, life=300):
         super().__init__(image_file, pos, dims, cost, life)
         self.pea_file = pea_file
     def ability(self):
@@ -54,6 +54,7 @@ class PeaShotter(Plants):
             new_pea = Pea(self.pea_file, (self.pos))
             peas.add(new_pea)
             self.ready = None
+            # Solo dispare si aparece un zombie
 
 class Pea(pygame.sprite.Sprite):
     def __init__(self, image_file, pos, dims=(800, 600)):
@@ -63,7 +64,7 @@ class Pea(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.image.get_rect(center=pos)
     def shoot(self):
-        self.rect.move_ip(1, 0)
+        self.rect.move_ip(2, 0)
 
 # Intizialize pygame
 pygame.init()
@@ -105,6 +106,8 @@ soles = pygame.sprite.Group()
 # MENÚ PRINCIPAL
 # =======================
 
+zombie_damage = 1500
+last_zombie_damage = -zombie_damage
 
 # Ejecutamos menú principal antes del juego
 main_menu()
@@ -178,21 +181,34 @@ while run:
         for j in range(rows):
             rect = pygame.Rect(i * cell_width, j * cell_height, cell_width, cell_height)
             pygame.draw.rect(screen, (0, 100, 0), rect, 2)  # Borde verde oscuro
-    for plant in get_all_palnts():
+    plants = get_all_palnts()
+    for plant in plants:
         plant.ability()
         screen.blit(plant.image, plant.rect)
-    for pea in peas:
-        pea.shoot()
-        screen.blit(pea.image, pea.rect)
+    for zombie in zombies:
+        collided_plants = pygame.sprite.spritecollide(zombie, plants, False)
+        if collided_plants:
+            for plant in collided_plants:
+                if zombie.ready_to_hit():
+                    plant.take_damage(100)
+                    zombie.ready_to_hit()
+        else:
+            zombie.movement()
+        screen.blit(zombie.surf, zombie.rect)
+            
+        if pygame.sprite.spritecollide(zombie, peas, True):
+            
+            zombie.selfdamage()
     for sol in soles:
         sol.action()
         screen.blit(sol.image, sol.rect)
-    for zombie in zombies:
-        zombie.movement()
-        screen.blit(zombie.surf, zombie.rect)
+    for pea in peas:
+        pea.shoot()
+        screen.blit(pea.image, pea.rect)
     for mower in lawnmowers:
         mower.movement(zombies)
         screen.blit(mower.image, mower.rect)
+        
         
     pygame.display.update()
     frames.tick(60)

@@ -16,6 +16,7 @@ class Zombies(pygame.sprite.Sprite):
         self.probability = zombie_type['probability']
         self.max_health = zombie_type['health']
         self.hability = None
+        self.ready = None
         
         if Zombie_types.get('ability') is not None:
             hability_class = globals()[self.zombie_type["habilidad"]]
@@ -25,7 +26,11 @@ class Zombies(pygame.sprite.Sprite):
         
         image = pygame.image.load(self.image).convert_alpha()
         self.surf = pygame.transform.scale(image, (100, 90))
+        
+        
         self.cx, self.cy = cell_center(10, 6, 'zombie')
+        
+        # REVISAR, PROBLEMA DE TERMINADO DE JUEGO
         self.rect = self.surf.get_rect(center=(self.cx, self.cy))
         self.x = float(self.rect.x)
         
@@ -35,9 +40,10 @@ class Zombies(pygame.sprite.Sprite):
         # Corregir
         if self.rect.right <= 0:
             self.kill()
+            print("¡Zombie cruzó! Fin del juego.") # ACA HAY UN PROBLEMA!! ZOMBI SALTA TODO EL TABLERO
             pygame.quit()
             exit()
-    def selfdamage(self, damage=50):
+    def selfdamage(self, damage=20):
         self.health -= damage
         if self.health < self.max_health*0.4:
             try:
@@ -50,3 +56,12 @@ class Zombies(pygame.sprite.Sprite):
             self.speed = 0.5
         if self.health <= 0:
             self.kill()
+    def ready_to_hit(self):
+        if self.ready == None:
+            self.ready = pygame.time.get_ticks()
+            return True
+        elif pygame.time.get_ticks() - self.ready >= 1500:
+            self.ready = pygame.time.get_ticks()
+            return True
+        return False
+    

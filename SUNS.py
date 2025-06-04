@@ -30,10 +30,10 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
     elif key == 'zombie':
-        col = 10
+        # col = 10
         row = random.randint(1, 6)
         
-        cx = col * cell_width + cell_width // 2
+        cx = dims[0] + 50
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
 # Clase soles
