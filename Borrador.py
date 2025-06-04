@@ -1,9 +1,12 @@
 import pygame
-import random
+from random import choice,choices
 import BC
 import SUNS
-from pygame.locals import RLEACCEL
-from zombies import game, sprites
+from zombies import Zombies
+from lawnmower import add_lawnmowers
+from main_menu import main_menu
+from DataBase import Zombie_types
+
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
     def __init__(self, image_file, pos, dims = (800, 600), cost = 50, life = 100):
@@ -89,44 +92,18 @@ mapa = BC.Background('Images/mapa.jpg', [0, 0], dims)
 SUN_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(SUN_EVENT, 5000)
 
+ADDZOMBIE = pygame.USEREVENT + 2
+pygame.time.set_timer(ADDZOMBIE, choice([3000, 5000, 6000])) # Milisegundos de aparición
+zombies = pygame.sprite.Group()
+lawnmowers = add_lawnmowers(10, 6)
+
 # Grupo de soles
 soles = pygame.sprite.Group()
 
 
 # ========================
 # MENÚ PRINCIPAL
-# ========================
-def main_menu():
-    font = pygame.font.SysFont("impact", 50)
-    button_rect = pygame.Rect(600, 450, 200, 60)
-    button_config = pygame.Rect(250, 480, 350, 60)
-    clicked = False
-
-    while not clicked:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if button_rect.collidepoint(event.pos):
-                    clicked = True
-    
-        fondo = pygame.image.load("Images/pvz_udesa.jpeg").convert()
-        fondo = pygame.transform.scale(fondo, dims)  # opcional: adapta la imagen al tamaño de la pantalla
-        screen.blit(fondo, (0, 0))
-        title_text = font.render("Plants vs Zombies", True, (255, 255, 255))
-        play_text = font.render("Jugar", True, (0, 0, 0))
-        config_text = font.render("Configuracion", True, (0, 0, 0))
-        screen.blit(title_text, (200, 100))
-        pygame.draw.rect(screen, (255, 255, 0), button_rect)  # Botón amarillo
-        screen.blit(play_text, (button_rect.x + 40, button_rect.y + 5))
-        
-
-        pygame.draw.rect(screen, (150, 255, 0), button_config)  
-        screen.blit(config_text, (button_config.x + 10, button_config.y ))
-        
-
-        pygame.display.flip()
+# =======================
 
 
 # Ejecutamos menú principal antes del juego
@@ -137,7 +114,6 @@ main_menu()
 # ========================
 run = True
 sun_counter = 0
-zombie, ADDZOMBIE, lawnmowers = sprites()
 frames = pygame.time.Clock()
     
 pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
@@ -151,10 +127,17 @@ while run:
         elif event.type == SUN_EVENT:
             new_sun = SUNS.Suns('Images/sol.png')
             soles.add(new_sun)
+        elif event.type == ADDZOMBIE:
+            random_z = choices(list(Zombie_types.keys()), weights=[k['probability'] for k in Zombie_types.values()])[0]
+            zombie = Zombies(Zombie_types[random_z])
+            zombies.add(zombie)
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for sol in soles:
                 if sol.rect.collidepoint(event.pos):
                     sun_counter += sol.grab()
+            for zombie in zombies:
+                if zombie.rect.collidepoint(event.pos):
+                    zombie.selfdamage()
         # elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
         #     if time - last_sunflower_placed >= sunflower_cooldown:
         #         new_sunflower = PeaShotter('Images/Peashooter.png', pygame.mouse.get_pos(), 'Images/Pea.png')
@@ -174,6 +157,9 @@ while run:
                 elif event.key == pygame.K_n:
                     new_nut = Nut('Images/Nut.png', placement)
                     nuts.add(new_nut)
+        # if event.type == pygame.MOUSEMOTION:
+        #     print(event.pos)
+    
 
 
     soles.update()
@@ -201,8 +187,13 @@ while run:
     for sol in soles:
         sol.action()
         screen.blit(sol.image, sol.rect)
+    for zombie in zombies:
+        zombie.movement()
+        screen.blit(zombie.surf, zombie.rect)
+    for mower in lawnmowers:
+        mower.movement(zombies)
+        screen.blit(mower.image, mower.rect)
         
-    game(events, zombie, screen, ADDZOMBIE, lawnmowers)
     pygame.display.update()
     frames.tick(60)
 

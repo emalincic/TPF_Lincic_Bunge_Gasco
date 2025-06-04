@@ -50,30 +50,3 @@ class Zombies(pygame.sprite.Sprite):
             self.speed = 0.5
         if self.health <= 0:
             self.kill()
-def sprites():
-    ADDZOMBIE = pygame.USEREVENT + 1
-    pygame.time.set_timer(ADDZOMBIE, choice([3000, 5000, 6000]))
-    zombies = pygame.sprite.Group()
-    lawnmowers = add_lawnmowers(10, 6)
-    return zombies, ADDZOMBIE, lawnmowers
-    
-def game(events, zombies, screen, ADDZOMBIE, lawnmowers):
-    for event in events:
-        # if event.type == pygame.MOUSEMOTION:
-        #     print(event.pos)
-        if event.type == pygame.MOUSEBUTTONUP:
-            for zombie in zombies:
-                if zombie.rect.collidepoint(event.pos):
-                    zombie.selfdamage()
-            
-        if event.type == ADDZOMBIE:
-            random_z = choices(list(Zombie_types.keys()), weights=[k['probability'] for k in Zombie_types.values()])[0]
-            zombie = Zombies(Zombie_types[random_z])
-            zombies.add(zombie)
-    for zombie in zombies:
-        zombie.movement()
-        screen.blit(zombie.surf, zombie.rect)
-            
-    for mower in lawnmowers:
-        mower.movement(zombies)
-        screen.blit(mower.image, mower.rect)
