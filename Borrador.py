@@ -155,15 +155,18 @@ while run:
         #         last_sunflower_placed = time
         #     else: print("Not ready") # ACA HABRIA QUE IMPLEMENTAR LO QUE PASA EN EL COOLDOWN DE LAS PLANTAS
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:
-                new_peashooter = PeaShotter('Images/Peashooter.png', pygame.mouse.get_pos(), 'Images/Pea.png')
-                pea_shooters.add(new_peashooter)
-            elif event.key == pygame.K_g:
-                    new_sunflower = Sunflower('Images/Sunflower.png', pygame.mouse.get_pos())
-                    girasoles.add(new_sunflower)
-            elif event.key == pygame.K_n:
-                new_nut = Nut('Images/Nut.png', pygame.mouse.get_pos())
-                nuts.add(new_nut)
+            pos = pygame.mouse.get_pos()
+            placement = SUNS.cell_center(10, 6, 'plant', pos)
+            if placement != None and not any(p.rect.collidepoint(pos)for p in get_all_palnts()):
+                if event.key == pygame.K_p:
+                        new_peashooter = PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
+                        pea_shooters.add(new_peashooter)
+                elif event.key == pygame.K_g:
+                        new_sunflower = Sunflower('Images/Sunflower.png', placement)
+                        girasoles.add(new_sunflower)
+                elif event.key == pygame.K_n:
+                    new_nut = Nut('Images/Nut.png', placement)
+                    nuts.add(new_nut)
 
     soles.update()
     ##screen.fill((0, 0, 0))
@@ -191,7 +194,7 @@ while run:
         sol.action()
         screen.blit(sol.image, sol.rect)
 
-    print(sun_counter)
+    #print(sun_counter)
     pygame.display.update()
 
 pygame.quit() 

@@ -79,9 +79,6 @@ class Pea(pygame.sprite.Sprite):
 
 # Intizialize pygame
 pygame.init()
-
-def get_all_palnts():
-    return girasoles.sprites() + pea_shooters.sprites()
 soles = pygame.sprite.Group()
 girasoles = pygame.sprite.Group()
 pea_shooters = pygame.sprite.Group()
@@ -120,6 +117,7 @@ while run:
         #     else: print("Not ready") # ACA HABRIA QUE IMPLEMENTAR LO QUE PASA EN EL COOLDOWN DE LAS PLANTAS
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
+                SUNS.cell_center()
                 new_peashooter = PeaShotter('Images/Peashooter.png', pygame.mouse.get_pos(), 'Images/Pea.png')
                 pea_shooters.add(new_peashooter)
             elif event.key == pygame.K_g:

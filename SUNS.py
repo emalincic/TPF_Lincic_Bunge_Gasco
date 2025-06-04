@@ -5,9 +5,10 @@ import pygame
 def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
     cell_width = dims[0] // cols
     cell_height = dims[1] // rows
-    if key == 'plant':
+    if key == 'plant': # FALTA TERMINAR
         col = pos[0] // cell_width
         row = pos[1] // cell_height
+        if col == 0 or row == 0: return None
         center_x = col * cell_width + cell_width // 2
         center_y = row * cell_height + cell_height // 2
         return (center_x, center_y)
