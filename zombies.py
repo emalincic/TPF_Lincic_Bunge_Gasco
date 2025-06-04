@@ -3,8 +3,8 @@ from sys import exit
 from random import choices, choice
 from DataBase import Zombie_types
 from lawnmower import *
-w = 1200
-h = 800
+from SUNS import cell_center
+
 
 class Zombies(pygame.sprite.Sprite):
     def __init__(self, zombie_type):
@@ -25,13 +25,15 @@ class Zombies(pygame.sprite.Sprite):
         
         image = pygame.image.load(self.image).convert_alpha()
         self.surf = pygame.transform.scale(image, (100, 90))
-        self.rect = self.surf.get_rect(topleft=(w, choice([205, 310, 405, 500, 505])))
+        self.cx, self.cy = cell_center(10, 6, 'zombie')
+        self.rect = self.surf.get_rect(center=(self.cx, self.cy))
         self.x = float(self.rect.x)
         
     def movement(self):
         self.x -= self.speed
         self.rect.x = int(self.x)
-        if self.rect.right < 250:
+        # Corregir
+        if self.rect.right <= 0:
             self.kill()
             pygame.quit()
             exit()
@@ -44,16 +46,15 @@ class Zombies(pygame.sprite.Sprite):
                 self.image = self.zombie_type['image'][0]
             image = pygame.image.load(self.image).convert_alpha()
             self.surf = pygame.transform.scale(image, (100, 90))
-
-            x, y = self.rect.topleft
-            self.rect = self.surf.get_rect(topleft=(x, y))
+            self.rect = self.surf.get_rect(center=(self.cx, self.cy))
+            self.speed = 0.5
         if self.health <= 0:
             self.kill()
 def sprites():
     ADDZOMBIE = pygame.USEREVENT + 1
     pygame.time.set_timer(ADDZOMBIE, choice([3000, 5000, 6000]))
     zombies = pygame.sprite.Group()
-    lawnmowers = add_lawnmowers()
+    lawnmowers = add_lawnmowers(10, 6)
     return zombies, ADDZOMBIE, lawnmowers
     
 def game(events, zombies, screen, ADDZOMBIE, lawnmowers):
@@ -73,10 +74,6 @@ def game(events, zombies, screen, ADDZOMBIE, lawnmowers):
         zombie.movement()
         screen.blit(zombie.surf, zombie.rect)
             
-    
-    
     for mower in lawnmowers:
         mower.movement(zombies)
         screen.blit(mower.image, mower.rect)
-        
-    

@@ -3,6 +3,7 @@ import random
 import BC
 import SUNS
 from pygame.locals import RLEACCEL
+from zombies import game, sprites
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
     def __init__(self, image_file, pos, dims = (800, 600), cost = 50, life = 100):
@@ -110,7 +111,6 @@ def main_menu():
                 if button_rect.collidepoint(event.pos):
                     clicked = True
     
-         
         fondo = pygame.image.load("Images/pvz_udesa.jpeg").convert()
         fondo = pygame.transform.scale(fondo, dims)  # opcional: adapta la imagen al tamaño de la pantalla
         screen.blit(fondo, (0, 0))
@@ -137,8 +137,15 @@ main_menu()
 # ========================
 run = True
 sun_counter = 0
+zombie, ADDZOMBIE, lawnmowers = sprites()
+frames = pygame.time.Clock()
+    
+pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
+pygame.mixer.music.set_volume(1.0) 
+pygame.mixer.music.play(0)
 while run:
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT:
             run = False
         elif event.type == SUN_EVENT:
@@ -168,6 +175,7 @@ while run:
                     new_nut = Nut('Images/Nut.png', placement)
                     nuts.add(new_nut)
 
+
     soles.update()
     ##screen.fill((0, 0, 0))
     ##screen.blit(mapa.image, mapa.rect)
@@ -193,6 +201,10 @@ while run:
     for sol in soles:
         sol.action()
         screen.blit(sol.image, sol.rect)
+        
+    game(events, zombie, screen, ADDZOMBIE, lawnmowers)
+    pygame.display.update()
+    frames.tick(60)
 
     #print(sun_counter)
     pygame.display.update()

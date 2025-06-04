@@ -23,7 +23,19 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         cx = random.randint(cell_x, cell_x + cell_width - 1)
         cy = random.randint(cell_y, cell_y + cell_height - 1)
         return (cx, cy)
-       
+    elif key == 'lawnmower':
+        col = 0
+        row = pos
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'zombie':
+        col = 10
+        row = random.randint(1, 6)
+        
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
 # Clase soles
 class Suns(pygame.sprite.Sprite):
     def __init__(self, image_file, start_pos = None, fpy = None, dims=(1200, 600), value=50, cols = 10, rows = 6):

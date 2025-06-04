@@ -1,4 +1,5 @@
 import pygame
+from SUNS import cell_center
 
 
     
@@ -24,9 +25,11 @@ class Lawnmower(pygame.sprite.Sprite):
             if self.rect.left > 1200:
                 self.kill()
 
-def add_lawnmowers():
+def add_lawnmowers(cols= 10, rows = 6):
     lawnmowers = pygame.sprite.Group()
-    for i in range(5):
-        mower = Lawnmower(240,250 + i*100 )
-        lawnmowers.add(mower)
+    for row in range(1, 6): 
+        center = cell_center(cols, rows,'lawnmower', row)
+        if center:
+            mower = Lawnmower(*center)
+            lawnmowers.add(mower)
     return lawnmowers
