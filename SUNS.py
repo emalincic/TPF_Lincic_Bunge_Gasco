@@ -1,4 +1,4 @@
-import random
+from random import randint
 import pygame
 
 
@@ -16,12 +16,12 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         # Elegimos columnas 1 a 9 y filas 1 a 5 (ignoramos la fila y columna 0)
         first_col, last_call = 1, (cols - 2)
         first_row, last_row = 1, (rows - 1)
-        col = random.randint(first_col, last_call)
-        row = random.randint(first_row, last_row)
+        col = randint(first_col, last_call)
+        row = randint(first_row, last_row)
         cell_x = col * cell_width
         cell_y = row * cell_height
-        cx = random.randint(cell_x, cell_x + cell_width - 1)
-        cy = random.randint(cell_y, cell_y + cell_height - 1)
+        cx = randint(cell_x, cell_x + cell_width - 1)
+        cy = randint(cell_y, cell_y + cell_height - 1)
         return (cx, cy)
     elif key == 'lawnmower':
         col = 0
@@ -31,9 +31,15 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         return (cx, cy)
     elif key == 'zombie':
         # col = 10
-        row = random.randint(1, 6)
+        row = randint(1, 6)
         
         cx = dims[0] + 50
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'shovel':
+        col = 9
+        row = 0
+        cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
 # Clase soles

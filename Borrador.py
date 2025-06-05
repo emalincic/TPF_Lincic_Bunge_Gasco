@@ -6,6 +6,7 @@ from zombies import Zombies
 from lawnmower import add_lawnmowers
 from main_menu import main_menu
 from DataBase import Zombie_types
+from Selectables import selectable
 
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
@@ -60,9 +61,9 @@ class Pea(pygame.sprite.Sprite):
     def __init__(self, image_file, pos, dims=(800, 600)):
         super(Pea, self).__init__()
         non_dimmed = pygame.image.load(image_file).convert_alpha()
-        self.image = pygame.transform.scale(non_dimmed, (50, 50))
-        self.pos = pos
-        self.rect = self.image.get_rect(center=pos)
+        self.image = pygame.transform.scale(non_dimmed, (35, 35))
+        self.x, self.y = pos
+        self.rect = self.image.get_rect(center=(self.x, self.y-15))
     def shoot(self):
         self.rect.move_ip(2, 0)
 
@@ -76,6 +77,8 @@ peas = pygame.sprite.Group()
 
 def get_all_palnts():
     return girasoles.sprites() + pea_shooters.sprites() + nuts.sprites()
+
+
 
 
 sunflower_cooldown = 10000
@@ -115,6 +118,8 @@ main_menu()
 # ========================
 # LOOP PRINCIPAL DEL JUEGO
 # ========================
+
+
 run = True
 sun_counter = 0
 frames = pygame.time.Clock()
@@ -122,6 +127,10 @@ frames = pygame.time.Clock()
 pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
 pygame.mixer.music.set_volume(1.0) 
 pygame.mixer.music.play(0)
+
+
+selected_object = None
+dragging = False
 while run:
     events = pygame.event.get()
     for event in events:
@@ -135,12 +144,30 @@ while run:
             zombie = Zombies(Zombie_types[random_z])
             zombies.add(zombie)
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # for selectable in selectables:
+            #     if selectable.rect.collidepoint(event.pos):
+            #         dragging = True
+            #         selected_object = selectable
+                    
             for sol in soles:
                 if sol.rect.collidepoint(event.pos):
                     sun_counter += sol.grab()
+
             for zombie in zombies:
                 if zombie.rect.collidepoint(event.pos):
                     zombie.selfdamage()
+
+        # elif event.type == pygame.MOUSEBUTTONUP:
+        #     dragging = False
+        #     if selected_object:
+        #         selected_object.rect.center = SUNS.cell_center(10, 6, 'shovel')
+        #         selected_object = None
+
+        # if event.type == pygame.MOUSEMOTION and dragging:
+        #     print(event.pos)
+        #     selected_object.rect.center = (event.pos)
+        
+        
         # elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
         #     if time - last_sunflower_placed >= sunflower_cooldown:
         #         new_sunflower = PeaShotter('Images/Peashooter.png', pygame.mouse.get_pos(), 'Images/Pea.png')
@@ -208,6 +235,8 @@ while run:
     for mower in lawnmowers:
         mower.movement(zombies)
         screen.blit(mower.image, mower.rect)
+    # for selectable in selectables:
+    #     screen.blit(selectable.image, selectable.rect)
         
         
     pygame.display.update()
