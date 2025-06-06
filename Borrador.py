@@ -49,13 +49,14 @@ class PeaShotter(Plants):
         super().__init__(image_file, pos, dims, cost, life)
         self.pea_file = pea_file
     def ability(self):
+        if not any(z.cy == self.pos[1] for z in get_zombies()):
+            return None
         if self.ready == None:
             self.ready = pygame.time.get_ticks()
-        elif pygame.time.get_ticks() - self.ready >= 5000:
+        elif pygame.time.get_ticks() - self.ready >= 1400:
             new_pea = Pea(self.pea_file, (self.pos))
             peas.add(new_pea)
             self.ready = None
-            # Solo dispare si aparece un zombie
 
 class Pea(pygame.sprite.Sprite):
     def __init__(self, image_file, pos, dims=(800, 600)):
@@ -77,7 +78,8 @@ peas = pygame.sprite.Group()
 
 def get_all_palnts():
     return girasoles.sprites() + pea_shooters.sprites() + nuts.sprites()
-
+def get_zombies():
+    return zombies.sprites()
 
 
 
@@ -103,11 +105,6 @@ lawnmowers = add_lawnmowers(10, 6)
 
 # Grupo de soles
 soles = pygame.sprite.Group()
-
-
-# ========================
-# MENÚ PRINCIPAL
-# =======================
 
 zombie_damage = 1500
 last_zombie_damage = -zombie_damage
@@ -142,7 +139,7 @@ while run:
             soles.add(new_sun)
         elif event.type == ADDZOMBIE:
             random_z = choices(list(Zombie_types.keys()), weights=[k['probability'] for k in Zombie_types.values()])[0]
-            zombie = Zombies(Zombie_types[random_z])
+            zombie = Zombies(Zombie_types[random_z], random_z)
             zombies.add(zombie)
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for item in toolbar_group:
@@ -150,6 +147,7 @@ while run:
                     selected_object = item.key
                     # dragging = DraggingGhost(item.image)
                     dragging = item
+                    original_pos = dragging.rect.center
             # for selectable in selectables:
             #     if selectable.rect.collidepoint(event.pos):
             #         dragging = True
@@ -165,7 +163,7 @@ while run:
         elif event.type == pygame.MOUSEBUTTONUP and dragging:
             # if valid_grid_cell(event.pos):  # Verificás si se soltó en una celda
             #     place_plant(selected_id, event.pos)
-            dragging.rect.center = SUNS.cell_center(10, 6, selected_object)
+            dragging.rect.center = original_pos
             dragging = None
             selected_object = None
 
@@ -173,17 +171,6 @@ while run:
             dragging.rect.center = (event.pos)
             # dragging.update(event.pos)
 
-        # elif event.type == pygame.MOUSEBUTTONUP:
-        #     dragging = False
-        #     if selected_object:
-        #         selected_object
-        #         selected_object = None
-
-        # if event.type == pygame.MOUSEMOTION and dragging:
-        #     print(event.pos)
-        #     selected_object.rect.center = (event.pos)
-        
-        
         # elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
         #     if time - last_sunflower_placed >= sunflower_cooldown:
         #         new_sunflower = PeaShotter('Images/Peashooter.png', pygame.mouse.get_pos(), 'Images/Pea.png')
@@ -193,7 +180,7 @@ while run:
         elif event.type == pygame.KEYDOWN:
             pos = pygame.mouse.get_pos()
             placement = SUNS.cell_center(10, 6, 'plant', pos)
-            if placement != None and not any(p.rect.collidepoint(pos)for p in get_all_palnts()):
+            if placement != None and not any(p.rect.center == placement for p in get_all_palnts()):    
                 if event.key == pygame.K_p:
                         new_peashooter = PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
                         pea_shooters.add(new_peashooter)
@@ -203,15 +190,8 @@ while run:
                 elif event.key == pygame.K_n:
                     new_nut = Nut('Images/Nut.png', placement)
                     nuts.add(new_nut)
-        # if event.type == pygame.MOUSEMOTION:
-        #     print(event.pos)
     
-
-
     soles.update()
-    ##screen.fill((0, 0, 0))
-    ##screen.blit(mapa.image, mapa.rect)
-
     screen.fill((50, 120, 50))  # Fondo verde (opcional)
 
     # Dibujar grilla 9x5
@@ -230,7 +210,7 @@ while run:
         screen.blit(plant.image, plant.rect)
     for zombie in zombies:
         collided_plants = pygame.sprite.spritecollide(zombie, plants, False)
-        if collided_plants:
+        if collided_plants and zombie.balloon_ability(): ### ARREGLAR ZOMBIE GLOBO
             for plant in collided_plants:
                 if zombie.ready_to_hit():
                     plant.take_damage(100)
@@ -238,10 +218,9 @@ while run:
         else:
             zombie.movement()
         screen.blit(zombie.surf, zombie.rect)
-            
         if pygame.sprite.spritecollide(zombie, peas, True):
-            
             zombie.selfdamage()
+
     for sol in soles:
         sol.action()
         screen.blit(sol.image, sol.rect)
@@ -251,8 +230,6 @@ while run:
     for mower in lawnmowers:
         mower.movement(zombies)
         screen.blit(mower.image, mower.rect)
-    # for selectable in selectables:
-    #     screen.blit(selectable.image, selectable.rect)
         
     toolbar_group.draw(screen)
     pygame.display.update()

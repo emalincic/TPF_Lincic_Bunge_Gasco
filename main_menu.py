@@ -1,9 +1,8 @@
 import pygame
-
 def main_menu():
     dims = (1200, 600)
     screen = pygame.display.set_mode(dims)
-    font = pygame.font.SysFont("impact", 50)
+    font = pygame.font.Font("04B_03__.TTF", 50)
     button_rect = pygame.Rect(600, 450, 200, 60)
     button_config = pygame.Rect(250, 480, 350, 60)
     clicked = False

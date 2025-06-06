@@ -7,7 +7,7 @@ from SUNS import cell_center
 
 
 class Zombies(pygame.sprite.Sprite):
-    def __init__(self, zombie_type):
+    def __init__(self, zombie_type, random_z):
         super(Zombies, self).__init__()
         self.zombie_type = zombie_type
         self.health = zombie_type['health']
@@ -17,6 +17,7 @@ class Zombies(pygame.sprite.Sprite):
         self.max_health = zombie_type['health']
         self.hability = None
         self.ready = None
+        self.type = random_z
         
         if Zombie_types.get('ability') is not None:
             hability_class = globals()[self.zombie_type["habilidad"]]
@@ -64,4 +65,9 @@ class Zombies(pygame.sprite.Sprite):
             self.ready = pygame.time.get_ticks()
             return True
         return False
+
+    def balloon_ability(self):
+        if self.type == 'balloon' and self.health < self.max_health*0.4: 
+            return False
+        return True
     
