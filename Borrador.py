@@ -109,6 +109,14 @@ soles = pygame.sprite.Group()
 zombie_damage = 1500
 last_zombie_damage = -zombie_damage
 
+# Clase boton del sol
+class Sun_Counter(pygame.sprite.Sprite):
+        def __init__(self, image_file, dims):
+            super(Sun_Counter, self).__init__()
+            
+
+
+
 # Ejecutamos menú principal antes del juego
 main_menu()
 

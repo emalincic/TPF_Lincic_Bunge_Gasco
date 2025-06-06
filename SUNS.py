@@ -59,6 +59,12 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
+    elif key == 'sun_counter':
+        row = 0
+        col = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)        
 # Clase soles
 class Suns(pygame.sprite.Sprite):
     def __init__(self, image_file, start_pos = None, fpy = None, dims=(1200, 600), value=50, cols = 10, rows = 6):
