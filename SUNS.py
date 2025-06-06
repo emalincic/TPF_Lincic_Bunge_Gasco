@@ -36,8 +36,26 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         cx = dims[0] + 50
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
-    elif key == 'shovel':
+    elif key == 'shovel_icon':
         col = 9
+        row = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'sunflower_icon':
+        col = 2
+        row = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'peashooter_icon':
+        col = 3
+        row = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'nut_icon':
+        col = 4
         row = 0
         cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2

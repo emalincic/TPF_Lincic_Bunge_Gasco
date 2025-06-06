@@ -6,7 +6,7 @@ from zombies import Zombies
 from lawnmower import add_lawnmowers
 from main_menu import main_menu
 from DataBase import Zombie_types
-from Selectables import selectable
+from Selectables import toolbar, DraggingGhost
 
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
@@ -128,9 +128,10 @@ pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
 pygame.mixer.music.set_volume(1.0) 
 pygame.mixer.music.play(0)
 
+toolbar_group = toolbar()
 
 selected_object = None
-dragging = False
+dragging = None
 while run:
     events = pygame.event.get()
     for event in events:
@@ -144,6 +145,11 @@ while run:
             zombie = Zombies(Zombie_types[random_z])
             zombies.add(zombie)
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            for item in toolbar_group:
+                if item.rect.collidepoint(event.pos):
+                    selected_object = item.key
+                    # dragging = DraggingGhost(item.image)
+                    dragging = item
             # for selectable in selectables:
             #     if selectable.rect.collidepoint(event.pos):
             #         dragging = True
@@ -156,11 +162,21 @@ while run:
             for zombie in zombies:
                 if zombie.rect.collidepoint(event.pos):
                     zombie.selfdamage()
+        elif event.type == pygame.MOUSEBUTTONUP and dragging:
+            # if valid_grid_cell(event.pos):  # Verificás si se soltó en una celda
+            #     place_plant(selected_id, event.pos)
+            dragging.rect.center = SUNS.cell_center(10, 6, selected_object)
+            dragging = None
+            selected_object = None
+
+        elif event.type == pygame.MOUSEMOTION and dragging:
+            dragging.rect.center = (event.pos)
+            # dragging.update(event.pos)
 
         # elif event.type == pygame.MOUSEBUTTONUP:
         #     dragging = False
         #     if selected_object:
-        #         selected_object.rect.center = SUNS.cell_center(10, 6, 'shovel')
+        #         selected_object
         #         selected_object = None
 
         # if event.type == pygame.MOUSEMOTION and dragging:
@@ -238,7 +254,7 @@ while run:
     # for selectable in selectables:
     #     screen.blit(selectable.image, selectable.rect)
         
-        
+    toolbar_group.draw(screen)
     pygame.display.update()
     frames.tick(60)
 
