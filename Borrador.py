@@ -202,16 +202,20 @@ while run:
     soles.update()
     screen.fill((50, 120, 50))  # Fondo verde (opcional)
 
-    # Dibujar grilla 9x5
+    # Dibujar grilla 10x6 dinámica
     cols = 10
     rows = 6
-    cell_width = dims[0] // cols   # 1200 / 9 = 133
-    cell_height = dims[1] // rows  # 600 / 5 = 120
+    width, height = screen.get_size()    # ancho y alto actuales
+    cell_width  = width  // cols
+    cell_height = height // rows
 
     for i in range(cols):
         for j in range(rows):
-            rect = pygame.Rect(i * cell_width, j * cell_height, cell_width, cell_height)
-            pygame.draw.rect(screen, (0, 100, 0), rect, 2)  # Borde verde oscuro
+            rect = pygame.Rect(i * cell_width,
+                            j * cell_height,
+                            cell_width,
+                            cell_height)
+            pygame.draw.rect(screen, (0, 100, 0), rect, 2)
     plants = get_all_palnts()
     for plant in plants:
         plant.ability()
