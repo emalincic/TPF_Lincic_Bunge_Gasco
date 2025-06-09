@@ -6,7 +6,10 @@ from zombies import Zombies
 from lawnmower import add_lawnmowers
 from main_menu import main_menu
 from DataBase import Zombie_types
-from Selectables import toolbar, DraggingGhost
+from Selectables import toolbar
+
+# Ejecutamos menú principal antes del juego
+start_time = main_menu()
 
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
@@ -99,8 +102,9 @@ SUN_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(SUN_EVENT, 5000)
 
 ADDZOMBIE = pygame.USEREVENT + 2
-pygame.time.set_timer(ADDZOMBIE, choice([3000, 5000, 6000])) # Milisegundos de aparición
 zombies = pygame.sprite.Group()
+pygame.time.set_timer(ADDZOMBIE, choice([3000, 5000, 6000]))
+is_flag = True
 lawnmowers = add_lawnmowers(10, 6)
 
 # Grupo de soles
@@ -116,10 +120,6 @@ class Sun_Counter(pygame.sprite.Sprite):
             
 
 
-
-# Ejecutamos menú principal antes del juego
-main_menu()
-
 # ========================
 # LOOP PRINCIPAL DEL JUEGO
 # ========================
@@ -129,8 +129,7 @@ run = True
 sun_counter = 0
 frames = pygame.time.Clock()
     
-pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
-pygame.mixer.music.set_volume(1.0) 
+pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3') 
 pygame.mixer.music.play(0)
 
 toolbar_group, toolbar_group_ghost = toolbar()
@@ -138,17 +137,31 @@ toolbar_group, toolbar_group_ghost = toolbar()
 selected_object = None
 dragging = None
 while run:
+    current_time = pygame.time.get_ticks()
     events = pygame.event.get()
+    
     for event in events:
         if event.type == pygame.QUIT:
             run = False
+            
         elif event.type == SUN_EVENT:
             new_sun = SUNS.Suns('Images/sol.png')
             soles.add(new_sun)
+            
         elif event.type == ADDZOMBIE:
+            if (current_time - start_time) // 1000 >= 100 and is_flag:
+                    flag = Zombies(Zombie_types['flag'], 'flag')
+                    zombies.add(flag)
+                    
+                    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
+                    pygame.mixer.music.play(0)
+                    pygame.time.set_timer(ADDZOMBIE, choice([1000, 2000, 3000]))
+                    is_flag = False #! Arreglo del zombie con bandera
+                    
             random_z = choices(list(Zombie_types.keys()), weights=[k['probability'] for k in Zombie_types.values()])[0]
-            zombie = Zombies(Zombie_types[random_z], random_z)
-            zombies.add(zombie)
+            its_time_for_zombies = Zombies(Zombie_types[random_z], random_z)
+            zombies.add(its_time_for_zombies)
+            
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for item in toolbar_group_ghost:
                 if item.rect.collidepoint(event.pos):

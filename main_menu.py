@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 
 def main_menu():
     pygame.init()
@@ -15,7 +16,12 @@ def main_menu():
 
     fullscreen = False
 
+    pygame.mixer.music.load(os.path.join('Audio', 'Main Menu - Plants vs. Zombies 2.mp3'))
+    pygame.mixer.music.set_volume(1.0) 
+    pygame.mixer.music.play(-1)
+    
     while True:
+        start_time = pygame.time.get_ticks()
         # Obtengo tamaño dinámico en cada iteración
         width, height = screen.get_size()
 
@@ -34,7 +40,7 @@ def main_menu():
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if btn_play.collidepoint(event.pos):
-                    return  # sale del menú y arranca el juego
+                    return start_time # sale del menú y arranca el juego
 
                 elif btn_toggle.collidepoint(event.pos):
                     fullscreen = not fullscreen

@@ -5,7 +5,6 @@ from DataBase import Zombie_types
 from lawnmower import *
 from SUNS import cell_center
 
-
 class Zombies(pygame.sprite.Sprite):
     def __init__(self, zombie_type, random_z):
         super(Zombies, self).__init__()
@@ -18,6 +17,7 @@ class Zombies(pygame.sprite.Sprite):
         self.hability = None
         self.ready = None
         self.type = random_z
+        self.start_time = pygame.time.get_ticks()
         
         if Zombie_types.get('ability') is not None:
             hability_class = globals()[self.zombie_type["habilidad"]]
@@ -41,7 +41,7 @@ class Zombies(pygame.sprite.Sprite):
         # Corregir
         if self.rect.right <= 0:
             self.kill()
-            print("¡Zombie cruzó! Fin del juego.") # ACA HAY UN PROBLEMA!! ZOMBI SALTA TODO EL TABLERO
+            print("¡Zombie cruzó! Fin del juego.") #! ACA HAY UN PROBLEMA!! ZOMBI SALTA TODO EL TABLERO
             pygame.quit()
             exit()
     def selfdamage(self, damage=20):
@@ -70,4 +70,13 @@ class Zombies(pygame.sprite.Sprite):
         if self.type == 'balloon' and self.health < self.max_health*0.4: 
             return False
         return True
+    
+    # def flag(self):
+    #     current_time = pygame.time.get_ticks()
+    #     elapsed_minutes = (current_time - self.start_time) // 60000
+
+    #     if elapsed_minutes >= 1:
+    #         return True
+    #     else:
+    #         return False
     
