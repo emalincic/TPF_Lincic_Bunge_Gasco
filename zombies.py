@@ -80,3 +80,7 @@ class Zombies(pygame.sprite.Sprite):
     #     else:
     #         return False
     
+
+def get_zombies():
+    zombies = pygame.sprite.Group()
+    return zombies

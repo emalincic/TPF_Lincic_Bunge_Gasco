@@ -24,7 +24,7 @@ Zombie_types = {
         'health': 900,
         'speed': 0.75,
         'image': ['Images\Balloonzombie.png', 'Images\Balloonzombie2.png'],
-        'probability': 0.2,
+        'probability': 0.9,
         'ability': 'balloon_ability'
     },
     'flag' : {

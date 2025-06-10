@@ -61,7 +61,7 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         return (cx, cy)
     elif key == 'sun_counter':
         row = 0
-        col = 0
+        col = 0.5
         cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2
         return (cx, cy)        
@@ -99,4 +99,5 @@ class Suns(pygame.sprite.Sprite):
 class SF_sun(Suns):
     def __init__(self, image_file, start_pos, fpy, value=50):
         super().__init__(image_file, start_pos, fpy, value)
-    
+
+
