@@ -1,7 +1,6 @@
 import pygame
 import zombies
 import SUNS
-from groups import peas_group, soles_group
 
 # Clase Plantas
 class Plants(pygame.sprite.Sprite):
@@ -31,7 +30,6 @@ class Sunflower(Plants):
         elif pygame.time.get_ticks() - self.ready >= 10000:
             fpy = self.rect.centery
             sun = SUNS.SF_sun('Images/sol.png', self.rect.center, fpy)
-            soles_group.add(sun)
             self.ready = None
             return (sun, 'sunflower')
         return (None, None)

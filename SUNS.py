@@ -59,7 +59,7 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
-    elif key == 'sun_counter':
+    elif key == 'suncounter_icon':
         row = 0
         col = 0.5
         cx = col * cell_width + cell_width // 2
@@ -95,6 +95,14 @@ class Suns(pygame.sprite.Sprite):
     def grab(self):
         self.kill()
         return self.value
+
+# class Sun_Counter(pygame.sprite.Sprite):
+#         def __init__(self, image_file, pos):
+#             super(Sun_Counter, self).__init__()
+#             non_dimmed = pygame.image.load(image_file).convert_alpha()
+#             self.image = pygame.transform.scale(non_dimmed, (110, 110))
+#             self.pos = pos
+#             self.rect = self.image.get_rect(center=pos)
 
 class SF_sun(Suns):
     def __init__(self, image_file, start_pos, fpy, value=50):

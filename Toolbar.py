@@ -23,6 +23,7 @@ class SelectableItem(pygame.sprite.Sprite):
 
 def toolbar():
     toolbar_group = pygame.sprite.Group()
+    
     SF = pygame.image.load(os.path.join('Images','SF_seedpacket.png')).convert_alpha()
     SF_seedpacket = pygame.transform.scale(SF, (115, 90))
     PS = pygame.image.load(os.path.join('Images','PS_seedpacket.png')).convert_alpha()
@@ -31,16 +32,21 @@ def toolbar():
     NT_seedpacket = pygame.transform.scale(NT, (115, 90))
     SH = pygame.image.load(os.path.join('Images','SH_seedpacket.png')).convert_alpha()
     SH_seedpacket = pygame.transform.scale(SH, (115, 90))
+    SC = pygame.image.load(os.path.join('Images','SC_seedpacket.png')).convert_alpha()
+    SC_seedpacket = pygame.transform.scale(SC, (225, 165))
+
     
     
     SF_seedpacket = SelectableItem(SF_seedpacket, 'sunflower_icon')
     PS_seedpacket = SelectableItem(PS_seedpacket, 'peashooter_icon')
     NT_seedpacket = SelectableItem(NT_seedpacket, 'nut_icon')
     SH_seedpacket = SelectableItem(SH_seedpacket, 'shovel_icon')
+    SC_seedpacket = SelectableItem(SC_seedpacket, 'suncounter_icon')
     
-    toolbar_group.add(SF_seedpacket, PS_seedpacket, NT_seedpacket, SH_seedpacket)
+    toolbar_group.add(SF_seedpacket, PS_seedpacket, NT_seedpacket, SH_seedpacket, SC_seedpacket)
     
     toolbar_group_ghost = pygame.sprite.Group()
+    
     sunflower = pygame.image.load('Images/Sunflower.png').convert_alpha()
     sunflower_icon = pygame.transform.scale(sunflower, (100, 90))
     peashooter = pygame.image.load('Images/Peashooter.png').convert_alpha()

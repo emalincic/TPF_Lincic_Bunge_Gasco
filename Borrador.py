@@ -1,17 +1,23 @@
 import pygame
 from random import choice,choices
 import BC
-import SUNS
+import SUNS as SN
 import Plants as PL
-from zombies import Zombies, get_zombies
-from lawnmower import add_lawnmowers
+from zombies import Zombies
+import zombies as ZB
+import lawnmower as LM
 from main_menu import main_menu
-from DataBase import Zombie_types
-from Selectables import toolbar
+import DataBase as DB
+import Toolbar as TL
+import Gameloop as GL
+
 # Ejecutamos menú principal antes del juego
 start_time = main_menu()
+
+
 # Intizialize pygame
 pygame.init()
+# Grupos de las Plantas
 sunflowers = pygame.sprite.Group()
 pea_shooters_group = pygame.sprite.Group()
 nuts_group = pygame.sprite.Group()
@@ -41,43 +47,38 @@ mapa = BC.Background('Images/mapa.jpg', [0, 0], dims)
 
 # Evento personalizado para los soles
 SUN_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(SUN_EVENT, 5000)
+pygame.time.set_timer(SUN_EVENT, 10000)
 
 ADDZOMBIE = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDZOMBIE, choice([5000, 7000, 9000]))
+database = DB.Zombie_types
 is_flag = True
-lawnmowers = add_lawnmowers(10, 6)
+lawnmowers = LM.add_lawnmowers(10, 6)
 
 zombie_damage = 1500
 last_zombie_damage = -zombie_damage
 
-# Clase boton del sol
-class Sun_Counter(pygame.sprite.Sprite):
-        def __init__(self, image_file, pos):
-            super(Sun_Counter, self).__init__()
-            non_dimmed = pygame.image.load(image_file).convert_alpha()
-            self.image = pygame.transform.scale(non_dimmed, (110, 110))
-            self.pos = pos
-            self.rect = self.image.get_rect(center=pos)
+cursor_opended = pygame.image.load('Images/Mouse.png').convert_alpha()
+cursor_opended = pygame.transform.scale(cursor_opended, (40, 40))
 
-sun_amount = Sun_Counter('Images/Sun_Counter.png', SUNS.cell_center(10, 6, 'sun_counter'))
+cursor_pressed = pygame.image.load('Images/Mouse_click.png').convert_alpha()
+cursor_pressed = pygame.transform.scale(cursor_pressed, (40, 40))
 
-font = pygame.font.Font("04B_03__.TTF", 35)
+mouse_opened = pygame.cursors.Cursor((0, 0), cursor_opended)
+mouse_pressed = pygame.cursors.Cursor((0, 0), cursor_pressed)
 
-
-#screen.blit(sun_amount.image, sun_amount.rect)
-#suns_text = font.render(str(sun_counter), True, (0, 0, 0))
-#screen.blit(suns_text, (sun_amount.rect.centerx - 35, sun_amount.rect.centery + 10))     
-
+pygame.mouse.set_cursor(mouse_opened)
 
 run = True
-sun_counter = 1000
+sun_counter = 50
+font = pygame.font.Font("04B_03__.TTF", 50) 
+
 frames = pygame.time.Clock()
     
 pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3') 
 pygame.mixer.music.play(0)
 
-toolbar_group, toolbar_group_ghost = toolbar()
+toolbar_group, toolbar_group_ghost = TL.toolbar()
 
 selected_object = None
 dragging = None
@@ -86,25 +87,30 @@ while run:
     events = pygame.event.get()
     
     for event in events:
+        if pygame.mouse.get_pressed()[0]:
+            pygame.mouse.set_cursor(mouse_pressed)
+        else:
+            pygame.mouse.set_cursor(mouse_opened)
+            
         if event.type == pygame.QUIT:
             run = False
             
         elif event.type == SUN_EVENT:
-            new_sun = SUNS.Suns('Images/sol.png')
+            new_sun = SN.Suns('Images/sol.png')
             soles_group.add(new_sun)
             
         elif event.type == ADDZOMBIE:
             if (current_time - start_time) // 1000 >= 100 and is_flag:
-                    flag = Zombies(Zombie_types['flag'], 'flag')
+                    flag = ZB.Zombies(DB.Zombie_types['flag'], 'flag')
                     zombies.add(flag)
                     
                     pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
                     pygame.mixer.music.play(0)
-                    pygame.time.set_timer(ADDZOMBIE, choice([1000, 2000, 3000]))
+                    pygame.time.set_timer(ADDZOMBIE, choice([2500, 3000, 3500]))
                     is_flag = False #! Arreglo del zombie con bandera
                     
-            random_z = choices(list(Zombie_types.keys()), weights=[k['probability'] for k in Zombie_types.values()])[0]
-            its_time_for_zombies = Zombies(Zombie_types[random_z], random_z)
+            random_z = choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
+            its_time_for_zombies = Zombies(database[random_z], random_z)
             zombies.add(its_time_for_zombies)
             
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -120,11 +126,11 @@ while run:
 
         elif event.type == pygame.MOUSEBUTTONUP and dragging:
             pos = pygame.mouse.get_pos()
-            placement = SUNS.cell_center(10, 6, 'plant', pos)
+            placement = SN.cell_center(10, 6, 'plant', pos)
             if selected_object == 'shovel_icon': 
-                for plant in plants:
+                for plant in get_all_plants():
                     if plant.rect.collidepoint(pos):
-                        plant.remove() 
+                        sun_counter += plant.remove() 
                         break
 
             elif placement != None and not any(p.rect.center == placement for p in get_all_plants()):
@@ -154,72 +160,33 @@ while run:
         #     else: print("Not ready") # ACA HABRIA QUE IMPLEMENTAR LO QUE PASA EN EL COOLDOWN DE LAS PLANTAS
 
     
-    soles_group.update()
-    screen.fill((50, 120, 50))  # Fondo verde (opcional)
-
+    # SE ACTUALIZAN LOS OBJETOS
     # Dibujar grilla 10x6 dinámica
-    cols = 10
-    rows = 6
-    width, height = screen.get_size()    # ancho y alto actuales
-    cell_width  = width  // cols
-    cell_height = height // rows
-
-    for i in range(cols):
-        for j in range(rows):
-            rect = pygame.Rect(i * cell_width,
-                            j * cell_height,
-                            cell_width,
-                            cell_height)
-            pygame.draw.rect(screen, (0, 100, 0), rect, 2)
-
-    plants = get_all_plants()
-
-    for pea in peas_group:
-        pea.shoot()
-        screen.blit(pea.image, pea.rect)
-    for plant in plants:
-        action = plant.ability(zombies)
-        print(action)
-        if action[1] == 'peashotter':
-            peas_group.add(action[0])
-        elif action[1] == 'sunflower':
-            soles_group.add(action[0])
-
-
-        screen.blit(plant.image, plant.rect)
+    GL.update_grid(10, 6, screen)
+    # Actualizamos la posicion de los guisantes
+    GL.update_peas(peas_group, screen)
+    # Actualizamos acciones de las plantas
+    GL.update_plants(get_all_plants(), zombies, peas_group, soles_group, screen)
+    # Actualizamos acciones de los zombies
+    GL.udpate_zombies(zombies, get_all_plants(), peas_group, screen)
+    # Actualizamos los soles
+    GL.update_suns(soles_group, screen)
+    # Actaulizamos las cosechadoras
+    GL.update_lawnmowers(lawnmowers, zombies, screen)
     
-    for zombie in zombies:
-        if zombie.type == 'balloon' and zombie.balloon_ability():
-            zombie.movement()
-        else:
-            collided_plants = pygame.sprite.spritecollide(zombie, plants, False)
-            if collided_plants:# and zombie.balloon_ability(): #! ARREGLAR ZOMBIE GLOBO
-                for plant in collided_plants:
-                    if zombie.ready_to_hit():
-                        plant.take_damage(100)
-                        zombie.ready_to_hit()
-            else:
-                zombie.movement()
-            
-            screen.blit(zombie.surf, zombie.rect)
-            
-            if pygame.sprite.spritecollide(zombie, peas_group, True):
-                zombie.selfdamage()
-
-    for sol in soles_group:
-        sol.action()
-        screen.blit(sol.image, sol.rect)
-    for mower in lawnmowers:
-        mower.movement(zombies)
-        screen.blit(mower.image, mower.rect)
         
     toolbar_group_ghost.draw(screen)
     toolbar_group.draw(screen)
     print(sun_counter)
-    pygame.display.update()
+    # Convertir el contador a imagen de texto
+    counter = font.render(str(sun_counter), True, (255, 255, 255))  # Blanco
+    # Mostrarlo en pantalla, por ejemplo en la esquina superior izquierda
+    counter_sprite = list(toolbar_group)[-1]
+    counter_center = counter.get_rect(center=counter_sprite.rect.center)
+    screen.blit(counter, (counter_center[0]+20, counter_center[1]))
     frames.tick(60)
-
-    #print(sun_counter)
     pygame.display.update()
 
 pygame.quit() 
+
+
