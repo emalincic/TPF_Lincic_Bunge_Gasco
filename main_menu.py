@@ -40,7 +40,7 @@ def main_menu():
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if btn_play.collidepoint(event.pos):
-                    return start_time # sale del menú y arranca el juego
+                    return start_time,fullscreen # sale del menú y arranca el juego
 
                 elif btn_toggle.collidepoint(event.pos):
                     fullscreen = not fullscreen

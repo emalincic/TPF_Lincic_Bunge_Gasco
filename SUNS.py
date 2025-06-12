@@ -1,40 +1,39 @@
 from random import randint
+from utils import cell_size;
 import pygame
 
 
-def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
-    cell_width = dims[0] // cols
-    cell_height = dims[1] // rows
-    if key == 'plant': # FALTA TERMINAR
+def cell_center(cols, rows, key, pos=None):
+    # ← llamamos cada vez
+    cell_width, cell_height = cell_size()
+
+    if key == 'plant': #Falta terminar
         col = pos[0] // cell_width
         row = pos[1] // cell_height
-        if col == 0 or row == 0: return None
-        center_x = col * cell_width + cell_width // 2
-        center_y = row * cell_height + cell_height // 2
-        return (center_x, center_y)
+        if col == 0 or row == 0:
+            return None
+        return (col * cell_width + cell_width // 2,
+                row * cell_height + cell_height // 2)
+
     elif key == 'sun':
-        # Elegimos columnas 1 a 9 y filas 1 a 5 (ignoramos la fila y columna 0)
-        first_col, last_call = 1, (cols - 2)
-        first_row, last_row = 1, (rows - 1)
-        col = randint(first_col, last_call)
-        row = randint(first_row, last_row)
+        col = randint(1, cols - 2)
+        row = randint(1, rows - 1)
         cell_x = col * cell_width
         cell_y = row * cell_height
-        cx = randint(cell_x, cell_x + cell_width - 1)
-        cy = randint(cell_y, cell_y + cell_height - 1)
-        return (cx, cy)
+        return (randint(cell_x, cell_x + cell_width - 1),
+                randint(cell_y, cell_y + cell_height - 1))
+
     elif key == 'lawnmower':
-        col = 0
         row = pos
-        cx = col * cell_width + cell_width // 2
-        cy = row * cell_height + cell_height // 2
-        return (cx, cy)
+        return (cell_width // 2,
+                row * cell_height + cell_height // 2)
+
     elif key == 'zombie':
-        # col = 10
-        row = randint(1, 5)
-        cx = dims[0] + 50
-        cy = row * cell_height + cell_height // 2
-        return (cx, cy)
+        row = randint(1, rows - 1)
+        screen_w = pygame.display.get_surface().get_width()
+        return (screen_w + 50,
+                row * cell_height + cell_height // 2)
+
     elif key == 'shovel_icon':
         col = 9
         row = 0
@@ -67,7 +66,7 @@ def cell_center(cols, rows, key, pos = None, dims=(1200, 600)):
         return (cx, cy)        
 # Clase soles
 class Suns(pygame.sprite.Sprite):
-    def __init__(self, image_file, start_pos = None, fpy = None, dims=(1200, 600), value=50, cols = 10, rows = 6):
+    def __init__(self, image_file, start_pos = None, fpy = None, value=50, cols = 10, rows = 6):
         super(Suns, self).__init__()
         non_dimmed = pygame.image.load(image_file).convert_alpha()
         self.image = pygame.transform.scale(non_dimmed, (80, 80))

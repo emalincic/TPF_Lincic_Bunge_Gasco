@@ -12,7 +12,7 @@ import Toolbar as TL
 import Gameloop as GL
 
 # Ejecutamos menú principal antes del juego
-start_time = main_menu()
+start_time, fullscreen = main_menu()  
 
 
 # Intizialize pygame
@@ -38,12 +38,12 @@ sunflower_cooldown = 10000
 last_sunflower_placed = -sunflower_cooldown # Tratar de incorporar cooldowns en las clases??
 
 # Creamos ventana
-dims = (1200, 600)
-screen = pygame.display.set_mode(dims)
+screen = pygame.display.get_surface()  # ← no crea otra
+dims   = screen.get_size()             # (ancho, alto) actuales
 pygame.display.set_caption('Plants vs Zombies')
 
 # Creamos el mapa según la imagen
-mapa = BC.Background('Images/mapa.jpg', [0, 0], dims)
+mapa = BC.Background('Images/mapa.jpg', [0, 0], screen)
 
 # Evento personalizado para los soles
 SUN_EVENT = pygame.USEREVENT + 1

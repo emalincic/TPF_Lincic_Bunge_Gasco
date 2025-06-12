@@ -1,66 +1,65 @@
-import pygame
-from SUNS import cell_center
 import os
+import pygame
+from utils import cell_size
+from SUNS import cell_center
+
 
 class DraggingGhost(pygame.sprite.Sprite):
-    def __init__(self, image, key):
+    
+
+    def __init__(self, image: pygame.Surface, key: str):
         super().__init__()
-        self.image = image
-        self.image.set_alpha(128)
-        self.pos = cell_center(10, 6, key)
-        self.rect = self.image.get_rect(center=self.pos)
+        self.image = image.copy()
+        self.image.set_alpha(128)  
+        self.rect = self.image.get_rect(center=cell_center(10, 6, key))
         self.key = key
 
 
 class SelectableItem(pygame.sprite.Sprite):
-    def __init__(self, image, key):
+
+    def __init__(self, image: pygame.Surface, key: str):
         super().__init__()
         self.image = image
-        self.pos = cell_center(10, 6, key)
-        self.rect = self.image.get_rect(center=self.pos)
+        self.rect = self.image.get_rect(center=cell_center(10, 6, key))
         self.key = key
 
 
-def toolbar():
+def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
+    path = os.path.join("Images", filename)
+    surf = pygame.image.load(path).convert_alpha()
+    return pygame.transform.scale(surf, size)
+
+
+def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
+
+    cols, rows = 10, 6  # rejilla lógica
+    cell_w, cell_h = cell_size()
+
+    
+    seed_size = (int(cell_h * 1.10), int(cell_h))       # paquetes
+    icon_size = (int(cell_h * 0.70), int(cell_h * 0.80))  # iconos "fantasma"
+    counter_size = (int(cell_h * 2.25), int(cell_h * 1.50))
+
     toolbar_group = pygame.sprite.Group()
-    
-    SF = pygame.image.load(os.path.join('Images','SF_seedpacket.png')).convert_alpha()
-    SF_seedpacket = pygame.transform.scale(SF, (115, 90))
-    PS = pygame.image.load(os.path.join('Images','PS_seedpacket.png')).convert_alpha()
-    PS_seedpacket = pygame.transform.scale(PS, (115, 90))
-    NT = pygame.image.load(os.path.join('Images','NT_seedpacket.png')).convert_alpha()
-    NT_seedpacket = pygame.transform.scale(NT, (115, 90))
-    SH = pygame.image.load(os.path.join('Images','SH_seedpacket.png')).convert_alpha()
-    SH_seedpacket = pygame.transform.scale(SH, (115, 90))
-    SC = pygame.image.load(os.path.join('Images','SC_seedpacket.png')).convert_alpha()
-    SC_seedpacket = pygame.transform.scale(SC, (225, 165))
-
-    
-    
-    SF_seedpacket = SelectableItem(SF_seedpacket, 'sunflower_icon')
-    PS_seedpacket = SelectableItem(PS_seedpacket, 'peashooter_icon')
-    NT_seedpacket = SelectableItem(NT_seedpacket, 'nut_icon')
-    SH_seedpacket = SelectableItem(SH_seedpacket, 'shovel_icon')
-    SC_seedpacket = SelectableItem(SC_seedpacket, 'suncounter_icon')
-    
-    toolbar_group.add(SF_seedpacket, PS_seedpacket, NT_seedpacket, SH_seedpacket, SC_seedpacket)
-    
     toolbar_group_ghost = pygame.sprite.Group()
-    
-    sunflower = pygame.image.load('Images/Sunflower.png').convert_alpha()
-    sunflower_icon = pygame.transform.scale(sunflower, (100, 90))
-    peashooter = pygame.image.load('Images/Peashooter.png').convert_alpha()
-    peashooter_icon = pygame.transform.scale(peashooter, (100, 90))
-    Nut = pygame.image.load('Images/Nut.png').convert_alpha()
-    Nut_icon = pygame.transform.scale(Nut, (100, 90))
-    shovel = pygame.image.load('Images/shovel_ghost.png').convert_alpha()
-    shovel_icon = pygame.transform.scale(shovel, (100, 90))
-    
-    sunflower = DraggingGhost(sunflower_icon, "sunflower_icon")
-    peashooter = DraggingGhost(peashooter_icon, "peashooter_icon")
-    nut = DraggingGhost(Nut_icon, "nut_icon")
-    shovel = DraggingGhost(shovel_icon, "shovel_icon")
 
-    toolbar_group_ghost.add(sunflower, peashooter, nut, shovel)
+
+    for seed_file, key, icon_file in [
+        ("SF_seedpacket.png", "sunflower_icon", "Sunflower.png"),
+        ("PS_seedpacket.png", "peashooter_icon", "Peashooter.png"),
+        ("NT_seedpacket.png", "nut_icon", "Nut.png"),
+        ("SH_seedpacket.png", "shovel_icon", "shovel_ghost.png"),
+    ]:
+      
+        seed_img = _load_scaled(seed_file, seed_size)
+        toolbar_group.add(SelectableItem(seed_img, key))
+
+      
+        icon_img = _load_scaled(icon_file, icon_size)
+        toolbar_group_ghost.add(DraggingGhost(icon_img, key))
+
+    
+    counter_img = _load_scaled("SC_seedpacket.png", counter_size)
+    toolbar_group.add(SelectableItem(counter_img, "suncounter_icon"))
+
     return toolbar_group, toolbar_group_ghost
-
