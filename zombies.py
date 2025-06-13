@@ -59,20 +59,19 @@ class Zombies(pygame.sprite.Sprite):
             self._ready_time = pygame.time.get_ticks()
             return True
         return False
-
-    def balloon_ability(self):
-        if self.type == "balloon" and self.health < self.max_health * 0.4:
-            return False
-        return True
-    # def flag(self):
-    #     current_time = pygame.time.get_ticks()
-    #     elapsed_minutes = (current_time - self.start_time) // 60000
-
-    #     if elapsed_minutes >= 1:
-    #         return True
-    #     else:
-    #         return False
     
+    
+class balloon(Zombies): 
+    def __init__(self, zombie_type, random_z):
+        super().__init__(zombie_type, random_z)
+    def balloon_ability(self):
+        if self.health < self.max_health * 0.4:
+            self.type = 'Normal'
+            self.image = 'Images\Balloonzombie2.png'
+            raw = pygame.image.load(self.image).convert_alpha()
+            c_w, c_h = cell_size()
+            self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))
+            self.rect = self.surf.get_rect(center=(self.cx, self.cy))
 
 def get_zombies():
     return pygame.sprite.Group()

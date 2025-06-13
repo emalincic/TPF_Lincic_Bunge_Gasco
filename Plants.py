@@ -26,7 +26,7 @@ class Plants(pygame.sprite.Sprite):
 class Sunflower(Plants):
     def __init__(self, image_file, pos, cost=50, life=300):
         super().__init__(image_file, pos, cost, life)
-    def ability(self, zombis):
+    def ability(self, zombies):
         if self.ready is None:
             self.ready = pygame.time.get_ticks()
         elif pygame.time.get_ticks() - self.ready >= 10000:
@@ -69,4 +69,16 @@ class Pea(pygame.sprite.Sprite):
     def shoot(self):
         self.rect.move_ip(2, 0)
 
-
+class Spinning_Nut(Plants):
+    def __init__(self, image_file, pos, cost=None, life=None):
+        super().__init__(image_file, pos, cost, life)
+        self.speed = 8
+        cw, ch = cell_size()
+        self.image = pygame.transform.scale(raw, (cw, ch))
+        self.original_image = pygame.transform.scale(raw, (cw, ch))
+        raw = pygame.image.load(image_file).convert_alpha()
+        self.rect = self.image.get_rect(midright=pos)
+        self.rotation = 0
+    def ability(self):
+        self.rotation += 1
+        self.image = pygame.transform.rotate(self.original_image, self.rotation)
