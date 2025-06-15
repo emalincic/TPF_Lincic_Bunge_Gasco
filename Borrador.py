@@ -10,6 +10,8 @@ from main_menu import main_menu
 import DataBase as DB
 import Toolbar as TL
 import Gameloop as GL
+from utils import GAME_OVER
+from game_over_menu import show_game_over
 
 # Ejecutamos menú principal antes del juego
 start_time, fullscreen = main_menu()  
@@ -50,6 +52,7 @@ ADDZOMBIE = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDZOMBIE, choice([5000, 7000, 9000]))
 database = DB.Zombie_types
 is_flag = True
+#Evento de Game Over
 
 # Obtenemos las lawnmowers
 lawnmowers = LM.add_lawnmowers(10, 6)
@@ -85,6 +88,11 @@ while run:
             
         if event.type == pygame.QUIT:
             run = False
+        elif event.type == GAME_OVER:
+            print(">> GAME_OVER recibido")
+            show_game_over(screen)   
+            run = False 
+            break
         elif event.type == SUN_EVENT:
             new_sun = SN.Suns('Images/sol.png')
             soles_group.add(new_sun)
@@ -157,7 +165,7 @@ while run:
     counter_sprite = list(toolbar_group)[-1]
     counter_center = counter.get_rect(center=counter_sprite.rect.center)
     screen.blit(counter, (counter_center[0]+35, counter_center[1]+5))
-    frames.tick(60)
+    frames.tick(30) # Limitar a 30 FPS
     pygame.display.update()
 
 pygame.quit() 

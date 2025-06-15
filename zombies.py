@@ -3,7 +3,8 @@ from sys import exit
 from DataBase import Zombie_types
 from SUNS import cell_center
 from utils import cell_size
-
+from game_over_menu import show_game_over
+from utils import GAME_OVER
 class Zombies(pygame.sprite.Sprite):
     def __init__(self, zombie_type, random_z: str):
         super().__init__()
@@ -33,9 +34,9 @@ class Zombies(pygame.sprite.Sprite):
         self.x -= self.speed
         self.rect.x = int(self.x)
         if self.rect.right <= 0:
-            pygame.quit()
-            exit()
-
+            pygame.event.post(pygame.event.Event(GAME_OVER))  
+            self.kill()
+            
     def selfdamage(self, dmg: int = 20):
         self.health -= dmg
         if self.health < self.max_health * 0.4:
