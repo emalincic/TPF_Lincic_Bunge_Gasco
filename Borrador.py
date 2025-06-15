@@ -89,7 +89,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         elif event.type == GAME_OVER:
-            print(">> GAME_OVER recibido")
+            
             show_game_over(screen)   
             run = False 
             break
@@ -117,9 +117,15 @@ while run:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for item in toolbar_group_ghost:
                 if item.rect.collidepoint(event.pos):
-                    selected_object = item.key
-                    dragging = item
-                    original_pos = dragging.rect.center
+                    real_card = next(card for card in toolbar_group if card.key == item.key)
+
+                    if real_card.ready():           
+                        selected_object = item.key
+                        dragging = item
+                        original_pos = dragging.rect.center
+                    else:
+               
+                        pass
                     
             for sol in soles_group:
                 if sol.rect.collidepoint(event.pos):
@@ -128,15 +134,26 @@ while run:
         elif event.type == pygame.MOUSEBUTTONUP and dragging:
             pos = pygame.mouse.get_pos()
             placement = SN.cell_center(10, 6, 'plant', pos)
-            
-            if selected_object == 'shovel_icon':
-                sun_counter += GL.shovel_action(get_all_plants(), pos) 
 
-            elif placement != None and not any(p.rect.center == placement for p in get_all_plants()):
-                sun_counter -= GL.plant_placement(selected_object, sun_counter, placement, pea_shooters_group, sunflowers, nuts_group)
-            
+            if selected_object == 'shovel_icon':
+                sun_counter += GL.shovel_action(get_all_plants(), pos)
+
+            elif placement is not None and not any(
+                    p.rect.center == placement for p in get_all_plants()):
+                
+                cost = GL.plant_placement(
+                    selected_object, sun_counter, placement,
+                    pea_shooters_group, sunflowers, nuts_group
+                )                                       
+                if cost:                                
+                    sun_counter -= cost                
+                    for card in toolbar_group:          
+                        if card.key == selected_object: 
+                            card.start_cooldown()       
+                            break                       
+
             dragging.rect.center = original_pos
-            dragging = None
+            dragging = None            
             selected_object = None
         elif event.type == pygame.MOUSEMOTION and dragging:
             dragging.rect.center = (event.pos)
@@ -156,7 +173,7 @@ while run:
     # Actaulizamos las cosechadoras
     GL.update_lawnmowers(lawnmowers, zombies, screen)
     
-        
+    toolbar_group.update()  
     toolbar_group_ghost.draw(screen)
     toolbar_group.draw(screen)
     # Convertir el contador a imagen de texto
@@ -165,7 +182,7 @@ while run:
     counter_sprite = list(toolbar_group)[-1]
     counter_center = counter.get_rect(center=counter_sprite.rect.center)
     screen.blit(counter, (counter_center[0]+35, counter_center[1]+5))
-    frames.tick(30) # Limitar a 30 FPS
+    frames.tick(60) # Limitar a 60 FPS
     pygame.display.update()
 
 pygame.quit() 

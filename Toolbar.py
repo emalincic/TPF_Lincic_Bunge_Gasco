@@ -9,6 +9,7 @@ class DraggingGhost(pygame.sprite.Sprite):
 
     def __init__(self, image: pygame.Surface, key: str):
         super().__init__()
+        self.base_image = image 
         self.image = image.copy()
         self.image.set_alpha(128)  
         self.rect = self.image.get_rect(center=SN.cell_center(10, 6, key))
@@ -19,14 +20,39 @@ class SelectableItem(pygame.sprite.Sprite):
 
     def __init__(self, image: pygame.Surface, key: str):
         super().__init__()
+        self.base_image = image.copy()  
         self.image = image
         self.rect = self.image.get_rect(center=SN.cell_center(10, 6, key))
         self.key = key
-        
+        self.cooldown_end = 0  
     def item_in_belt(self):
         self.rect.x += 8
 
+    def ready(self):
+        
+        return pygame.time.get_ticks() >= self.cooldown_end
 
+    def start_cooldown(self):
+        
+        self.cooldown_end = pygame.time.get_ticks() + UT.SEED_COOLDOWN
+
+    def update(self):
+        
+        if self.ready():
+            self.image = self.base_image
+        else:
+            
+            now   = pygame.time.get_ticks()
+            left  = self.cooldown_end - now        
+            ratio = left / UT.SEED_COOLDOWN         
+
+           
+            self.image = self.base_image.copy()
+
+           
+            shade = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
+            shade.fill((0, 0, 0, int(160 * ratio)))   
+            self.image.blit(shade, (0, 0))
 
 
 def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:

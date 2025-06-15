@@ -24,5 +24,5 @@ def show_game_over(screen):
         for ev in pygame.event.get():
             if ev.type in (pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
                 waiting = False
-        pygame.time.Clock().tick(30)
+        pygame.time.Clock().tick(60)
     return True          

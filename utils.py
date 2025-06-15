@@ -1,6 +1,7 @@
 import pygame
 COLS, ROWS = 10, 6
 GAME_OVER = pygame.USEREVENT + 3
+SEED_COOLDOWN = 5_000  
 def cell_size():
     surface = pygame.display.get_surface()
     if surface is None:        
