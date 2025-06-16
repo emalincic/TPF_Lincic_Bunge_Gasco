@@ -24,16 +24,19 @@ sunflowers = pygame.sprite.Group()
 pea_shooters_group = pygame.sprite.Group()
 nuts_group = pygame.sprite.Group()
 peas_group = pygame.sprite.Group()
+cherry_group = pygame.sprite.Group()
+papapum_group = pygame.sprite.Group()
+boomerangs_group = pygame.sprite.Group()
+boomerangs_bullet_group = pygame.sprite.Group()
+
 #* Grupo de los soles
 soles_group = pygame.sprite.Group()
 #* Grupon de los Zombies
 zombies = pygame.sprite.Group()
 
-def get_all_plants():
-    return sunflowers, pea_shooters_group, nuts_group, peas_group
 
 def get_all_plants():
-    return sunflowers.sprites() + pea_shooters_group.sprites() + nuts_group.sprites()
+    return sunflowers.sprites() + pea_shooters_group.sprites() + nuts_group.sprites() + cherry_group.sprites() + papapum_group.sprites() + boomerangs_group.sprites()
 
 # Creamos ventana
 screen = pygame.display.get_surface()  # ← no crea otra
@@ -143,7 +146,7 @@ while run:
                 
                 cost = GL.plant_placement(
                     selected_object, sun_counter, placement,
-                    pea_shooters_group, sunflowers, nuts_group
+                    pea_shooters_group, sunflowers, nuts_group, cherry_group, papapum_group, boomerangs_group
                 )                                       
                 if cost:                                
                     sun_counter -= cost                
@@ -163,11 +166,11 @@ while run:
     # Dibujar grilla 10x6 dinámica
     GL.update_grid(10, 6, screen)
     # Actualizamos la posicion de los guisantes
-    GL.update_peas(peas_group, screen)
+    GL.update_peas(peas_group, boomerangs_bullet_group, screen)
     # Actualizamos acciones de las plantas
-    GL.update_plants(get_all_plants(), zombies, peas_group, soles_group, screen)
+    GL.update_plants(get_all_plants(), zombies, peas_group, soles_group, boomerangs_bullet_group, screen)
     # Actualizamos acciones de los zombies
-    GL.udpate_zombies(zombies, get_all_plants(), peas_group, screen)
+    GL.udpate_zombies(zombies, get_all_plants(), peas_group, boomerangs_bullet_group, screen)
     # Actualizamos los soles
     GL.update_suns(soles_group, screen)
     # Actaulizamos las cosechadoras

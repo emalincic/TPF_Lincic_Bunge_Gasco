@@ -9,11 +9,14 @@ def shovel_action(plants, pos):
 
 
 # QUE PLANTA FUE SELECCIONADA
-def plant_placement(selected_object, sun_counter, placement, pea_shooters_group, sunflowers, nuts_group):
+def plant_placement(selected_object, sun_counter, placement, pea_shooters_group, sunflowers, nuts_group, cherry_group, papapum_group, boomerangs_group):
     if selected_object == 'peashooter_icon' and sun_counter >= 100:
-        plant_placed = PL.PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
-        pea_shooters_group.add(plant_placed)
-        cost = 100
+        plant_placed = PL.Boomerang('Images/boomerang_plant.png', placement, 'Images/boomerang.png')
+        boomerangs_group.add(plant_placed)
+        cost = 175
+        # plant_placed = PL.PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
+        # pea_shooters_group.add(plant_placed)
+        # cost = 100
     elif selected_object == 'sunflower_icon' and sun_counter >= 50:
         plant_placed = PL.Sunflower('Images/Sunflower.png', placement)
         sunflowers.add(plant_placed)
@@ -22,26 +25,43 @@ def plant_placement(selected_object, sun_counter, placement, pea_shooters_group,
         plant_placed = PL.Nut('Images/Nut.png', placement)
         nuts_group.add(plant_placed)
         cost = 50 
+    elif selected_object == 'cherry_icon' and sun_counter >= 200:
+        plant_placed = PL.cherry('Images/Cherry.png', placement)
+        cherry_group.add(plant_placed)
+        cost = 200
+    elif selected_object == 'papapum_icon' and sun_counter >= 25:
+        plant_placed = PL.Papapum('Images/papapum_unload.png', 'Images/papapum_load.png', placement)
+        papapum_group.add(plant_placed)
+        cost = 25
+    elif selected_object == 'boomerang_icon' and sun_counter >= 175:
+        plant_placed = PL.Boomerang('Images/boomerang_plant.png', placement, 'Images/boomerang.png')
+        boomerangs_group.add(plant_placed)
+        cost = 175
     return cost
 
 
 
 # ACCIONES DE LAS ENTIDADES
-def update_peas(peas_group, screen):
+def update_peas(peas_group, boomerangs_bullet_group, screen):
     for pea in peas_group:
         pea.shoot()
         screen.blit(pea.image, pea.rect)
+    for boomerang in boomerangs_bullet_group:
+        boomerang.shoot()
+        screen.blit(boomerang.image, boomerang.rect)
 
-def update_plants(plants, zombies, peas_group, soles_group, screen):
+def update_plants(plants, zombies, peas_group, soles_group, boomerangs_bullet_group, screen):
     for plant in plants:
         action = plant.ability(zombies)
         if action[1] == 'peashotter':
             peas_group.add(action[0])
         elif action[1] == 'sunflower':
             soles_group.add(action[0])
+        elif action[1]  == 'boomerang':
+            boomerangs_bullet_group.add(action[0])
         screen.blit(plant.image, plant.rect)
 
-def udpate_zombies(zombies, plants, peas_group, screen):
+def udpate_zombies(zombies, plants, peas_group, boomerangs_bullet_group, screen):
     for zombie in zombies:
         if zombie.type == 'balloon':
             zombie.balloon_ability()
@@ -56,7 +76,12 @@ def udpate_zombies(zombies, plants, peas_group, screen):
             zombie.movement()  
         screen.blit(zombie.surf, zombie.rect)
         if pygame.sprite.spritecollide(zombie, peas_group, True):
-            zombie.selfdamage()   
+            zombie.selfdamage()
+        for boomerang in boomerangs_bullet_group:
+            if id(zombie) not in boomerang.already_hit_zombies and boomerang.rect.colliderect(zombie.rect):
+                zombie.selfdamage()
+                boomerang.already_hit_zombies.add(id(zombie))
+  
 
 def update_suns(soles_group, screen):
     for sol in soles_group:

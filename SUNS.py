@@ -14,6 +14,11 @@ def cell_center(cols, rows, key, pos=None):
             return None
         return (col * cell_width + cell_width // 2,
                 row * cell_height + cell_height // 2)
+    
+    elif key == 'boomerang_range':
+        col = 9
+        row = pos // cell_width
+        return (col * cell_width + cell_width // 2, row)
 
     elif key == 'sun':
         col = randint(1, cols - 2)
@@ -63,7 +68,16 @@ def cell_center(cols, rows, key, pos=None):
         col = 0.5
         cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2
-        return (cx, cy)        
+        return (cx, cy)
+    elif key == 'cherry_range':
+        cx, cy = pos
+        # Explota en 3x3 celdas alrededor del centro (incluyendo la celda donde está la cereza)
+        left = cx - cell_width // 2 - cell_width
+        top = cy - cell_height // 2 - cell_height
+        width = cell_width * 3
+        height = cell_height * 3
+        return pygame.Rect(left, top, width, height)
+
 # Clase soles
 class Suns(pygame.sprite.Sprite):
     def __init__(self, image_file, start_pos = None, fpy = None, value=50, cols = 10, rows = 6):
