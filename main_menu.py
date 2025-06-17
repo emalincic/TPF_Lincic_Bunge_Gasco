@@ -9,7 +9,7 @@ def main_menu():
     pygame.display.set_caption("TPF PvZ")
     font = pygame.font.Font("04B_03__.TTF", 50)
     btn_font = pygame.font.Font("04B_03__.TTF", 25)   
-
+    btn_papapum_size = (200,60)
     btn_play_size   = (200, 60)
     btn_toggle_size = (300, 50)   # ancho suficiente para el texto
     margin = 20
@@ -32,6 +32,7 @@ def main_menu():
             margin,                                # y: margen superior
             *btn_toggle_size
         )
+        btn_papapum  = pygame.Rect(600, 450, *btn_papapum_size)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -48,6 +49,8 @@ def main_menu():
                         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
                     else:
                         screen = pygame.display.set_mode(default_dims)
+                
+                
 
         # Dibujo de fondo y botones
         fondo = pygame.image.load("Images/pvz_udesa.jpeg").convert()
@@ -70,6 +73,12 @@ def main_menu():
         text_x = btn_toggle.x + 10
         text_y = btn_toggle.y + (btn_toggle.height - toggle_text.get_height()) // 2
         screen.blit(toggle_text, (text_x, text_y))
+        #Boton Papapum
+        pygame.draw.rect(screen, (200, 255, 0), btn_papapum)
+        papapum_text = font.render("Papapapum", True, (0, 0, 0))
+        screen.blit(papapum_text, (btn_papapum.x-10, btn_papapum.y-5))
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
+
+

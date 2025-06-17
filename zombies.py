@@ -1,10 +1,8 @@
 import pygame
-from sys import exit
-from DataBase import Zombie_types
-from SUNS import cell_center
-from utils import cell_size
-from game_over_menu import show_game_over
-from utils import GAME_OVER
+import random
+import utils as UT
+import game_over_menu as GOM
+
 class Zombies(pygame.sprite.Sprite):
     def __init__(self, zombie_type, random_z: str):
         super().__init__()
@@ -13,6 +11,7 @@ class Zombies(pygame.sprite.Sprite):
         self.speed = zombie_type["speed"]
         self.image = zombie_type["image"][0]
         self.max_health = zombie_type["health"]
+        self.id = random.randint(0, 100000)
         self.type = random_z
         self.start_time = pygame.time.get_ticks()
 
@@ -21,12 +20,13 @@ class Zombies(pygame.sprite.Sprite):
             self.hability = clase_hab(self)
         else:
             self.hability = None
+        
 
         raw = pygame.image.load(self.image).convert_alpha()
-        c_w, c_h = cell_size()
+        c_w, c_h = UT.cell_size()
         self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))
 
-        self.cx, self.cy = cell_center(10, 6, "zombie")
+        self.cx, self.cy = UT.cell_center(10, 6, "zombie")
         self.rect = self.surf.get_rect(center=(self.cx, self.cy))
         self.x = float(self.rect.x)
 
@@ -45,10 +45,10 @@ class Zombies(pygame.sprite.Sprite):
             except IndexError:
                 self.image = self.zombie_type["image"][0]
             raw = pygame.image.load(self.image).convert_alpha()
-            c_w, c_h = cell_size()
+            c_w, c_h = UT.cell_size()
             self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))
             self.rect = self.surf.get_rect(center=(self.rect.centerx, self.rect.centery))
-            self.speed = max(0.5, cell_size()[0] / 240)
+            self.speed = max(0.5, UT.cell_size()[0] / 240)
         if self.health <= 0:
             self.kill()
 
@@ -70,7 +70,7 @@ class balloon(Zombies):
             self.type = 'Normal'
             self.image = 'Images\Balloonzombie2.png'
             raw = pygame.image.load(self.image).convert_alpha()
-            c_w, c_h = cell_size()
+            c_w, c_h = UT.cell_size()
             self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))
             self.rect = self.surf.get_rect(center=(self.cx, self.cy))
 

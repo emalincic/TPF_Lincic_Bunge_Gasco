@@ -11,12 +11,9 @@ def shovel_action(plants, pos):
 # QUE PLANTA FUE SELECCIONADA
 def plant_placement(selected_object, sun_counter, placement, pea_shooters_group, sunflowers, nuts_group, cherry_group, papapum_group, boomerangs_group):
     if selected_object == 'peashooter_icon' and sun_counter >= 100:
-        plant_placed = PL.Boomerang('Images/boomerang_plant.png', placement, 'Images/boomerang.png')
-        boomerangs_group.add(plant_placed)
-        cost = 175
-        # plant_placed = PL.PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
-        # pea_shooters_group.add(plant_placed)
-        # cost = 100
+        plant_placed = PL.PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
+        pea_shooters_group.add(plant_placed)
+        cost = 100
     elif selected_object == 'sunflower_icon' and sun_counter >= 50:
         plant_placed = PL.Sunflower('Images/Sunflower.png', placement)
         sunflowers.add(plant_placed)
@@ -78,9 +75,9 @@ def udpate_zombies(zombies, plants, peas_group, boomerangs_bullet_group, screen)
         if pygame.sprite.spritecollide(zombie, peas_group, True):
             zombie.selfdamage()
         for boomerang in boomerangs_bullet_group:
-            if id(zombie) not in boomerang.already_hit_zombies and boomerang.rect.colliderect(zombie.rect):
+            if zombie.id not in boomerang.already_hit_zombies and boomerang.rect.colliderect(zombie.rect):
                 zombie.selfdamage()
-                boomerang.already_hit_zombies.add(id(zombie))
+                boomerang.already_hit_zombies.append(zombie.id)
   
 
 def update_suns(soles_group, screen):
@@ -105,4 +102,56 @@ def update_grid(cols, rows, screen):
                             cell_width,
                             cell_height)
             pygame.draw.rect(screen, (0, 100, 0), rect, 2)
+
+# ============================
+# UPDATES FOR PAPAPAPAPUM MODE
+# ============================
+def update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, screen, dragging):
+    sorted_nuts = sorted(nuts_toolbar_group, key=lambda nut: nut.rect.x) 
+    sorted_nuts_ghost = sorted(nuts_group_ghost, key=lambda nut: nut.rect.x)
+
+    for i, (nut, nut_ghost) in enumerate(zip(sorted_nuts, sorted_nuts_ghost)):
+        if nut_ghost != dragging:
+            nut_ghost.rect.center = nut.rect.center
+        
+        can_move = True
+        
+        if nut.rect.collidepoint(list(belt_group)[0].rect.midright):
+            can_move = False
+            
+        if i + 1 < len(sorted_nuts):
+            next_nut = sorted_nuts[i + 1]
+            if nut.rect.right >= next_nut.rect.left:
+                can_move = False
+                
+
+        if can_move:
+            nut.item_in_belt()
+        
+        screen.blit(nut_ghost.image, nut_ghost.rect)
+        screen.blit(nut.image, nut.rect)
+        
+    for nut_placed in nuts_group:
+        screen.blit(nut_placed.image, nut_placed.rect)
+
+def update_zombies_papum(nuts_group, zombies, screen):
+    for zombie in zombies:
+        zombie.movement()  
+        screen.blit(zombie.surf, zombie.rect)
+        zombie_center = zombie.rect.center
+        for nut in nuts_group:
+            nut.ability()
+            if nut.rect.collidepoint(zombie_center) and not nut.already_hit:
+                zombie.selfdamage(500) 
+                nut.already_hit = True
+            nut.already_hit = False
+
+def nut_placement(placement, nuts_group, nuts_toolbar_group):
+    if placement:
+        nut_placed = PL.Spinning_Nut('Images/Nut.png', placement)
+        nuts_group.add(nut_placed)
+    for nuts in nuts_toolbar_group:
+        if placement:
+            nuts.kill()
+            break
     

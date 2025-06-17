@@ -1,7 +1,6 @@
 import os
 import pygame
 import utils as UT
-import SUNS as SN
 
 
 class DraggingGhost(pygame.sprite.Sprite):
@@ -12,7 +11,7 @@ class DraggingGhost(pygame.sprite.Sprite):
         self.base_image = image 
         self.image = image.copy()
         self.image.set_alpha(128)  
-        self.rect = self.image.get_rect(center=SN.cell_center(10, 6, key))
+        self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
         self.key = key
 
 
@@ -22,7 +21,7 @@ class SelectableItem(pygame.sprite.Sprite):
         super().__init__()
         self.base_image = image.copy()  
         self.image = image
-        self.rect = self.image.get_rect(center=SN.cell_center(10, 6, key))
+        self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
         self.key = key
         self.cooldown_end = 0  
     def item_in_belt(self):
@@ -54,6 +53,23 @@ class SelectableItem(pygame.sprite.Sprite):
             shade.fill((0, 0, 0, int(160 * ratio)))   
             self.image.blit(shade, (0, 0))
 
+class Delivery(pygame.sprite.Sprite):
+    def __init__(self, image, key, size):
+        super().__init__()
+        self.speed = 0.5
+        self.image = _load_scaled(image, size)
+        self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
+        self.key = key
+        
+    def item_in_belt(self):
+        self.rect.x += self.speed
+class Delivery_Ghost(pygame.sprite.Sprite):
+    def __init__(self, image, key, size):
+        super().__init__()
+        self.image = _load_scaled(image, size)
+        self.image.set_alpha(128)
+        self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
+        self.key = key
 
 def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
     path = os.path.join("Images", filename)
@@ -62,8 +78,6 @@ def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
 
 
 def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
-
-    cols, rows = 10, 6  # rejilla lógica
     cell_w, cell_h = UT.cell_size()
 
     
@@ -96,16 +110,17 @@ def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
 def special_delivery():
     
     cell_w, cell_h = UT.cell_size()
-    seed_size = (int(cell_h * 1.10), int(cell_h))       # paquetes
+    seed_size = (int(cell_h * 1.10), int(cell_h))
+    belt_size = (int(cell_h * 10), int(cell_h))
     
     belt_group = pygame.sprite.Group()
+    belt_group.add(Delivery('belt.png', 'belt_icon', belt_size))
     
-    belt_img = _load_scaled('belt.png', (300, 90))
-    belt_group.add(SelectableItem(belt_img, 'belt_icon'))
+    nuts_toolbar_group = pygame.sprite.Group()
+    nuts_toolbar_group.add(Delivery('NT_seedpacket.png', 'belt_nut_icon', (seed_size[0]-15, seed_size[1]-15)))
     
-    nuts_group = pygame.sprite.Group()
+    nuts_group_ghost = pygame.sprite.Group()
+    nuts_group_ghost.add(Delivery_Ghost('Nut.png', 'belt_icon', (seed_size[0]-15, seed_size[1]-15)))
     
-    nut_img = _load_scaled('NT_seedpacket.png', seed_size)
-    nuts_group.add(SelectableItem(nut_img, 'nut_icon'))
     
-    return belt_group, nuts_group
+    return belt_group, nuts_toolbar_group, nuts_group_ghost
