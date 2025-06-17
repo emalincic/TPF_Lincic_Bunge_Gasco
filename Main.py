@@ -98,7 +98,7 @@ def main():
                 run = False
             
             # Si pierde se abre la pantalla de 'game over'
-            elif event.type == GAME_OVER:               
+            elif event.type == UT.GAME_OVER:               
                 GOM.show_game_over(screen)   
                 run = False 
                 break

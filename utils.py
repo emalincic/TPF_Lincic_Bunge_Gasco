@@ -1,6 +1,14 @@
 import pygame
 from random import randint
-
+COLS, ROWS = 10, 6
+GAME_OVER = pygame.USEREVENT + 3
+SEED_COOLDOWN = 5_000  
+def cell_size():
+    surface = pygame.display.get_surface()
+    if surface is None:        
+        return 0, 0
+    w, h = surface.get_size()
+    return w // COLS, h // ROWS
 # Clase background
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location, screen):
@@ -27,16 +35,6 @@ def mouses(mouse_open, mouse_clicked):
     mouse_opened = pygame.cursors.Cursor((0, 0), cursor_opended)
     mouse_pressed = pygame.cursors.Cursor((0, 0), cursor_pressed)
     return mouse_opened, mouse_pressed
-
-
-COLS, ROWS = 10, 6
-
-def cell_size():
-    surface = pygame.display.get_surface()
-    if surface is None:        
-        return 0, 0
-    w, h = surface.get_size()
-    return w // COLS, h // ROWS
 
 def cell_center(cols, rows, key, pos=None):
     # ← llamamos cada vez
