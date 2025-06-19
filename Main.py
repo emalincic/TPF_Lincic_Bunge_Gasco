@@ -199,7 +199,7 @@ def main():
         counter_sprite = list(toolbar_group)[-1]
         counter_center = counter.get_rect(center=counter_sprite.rect.center)
         screen.blit(counter, (counter_center[0]+35, counter_center[1]+5))
-        frames.tick(500) # Limitar a 60 FPS
+        frames.tick(60) # Limitar a 60 FPS
         pygame.display.update()
         for plant in get_all_plants():
             print(plant.life)
