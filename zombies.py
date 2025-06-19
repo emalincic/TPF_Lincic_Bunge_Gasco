@@ -1,6 +1,7 @@
 import pygame
 import random
 import utils as UT
+from utils import GAME_OVER
 import game_over_menu as GOM
 
 class Zombies(pygame.sprite.Sprite):

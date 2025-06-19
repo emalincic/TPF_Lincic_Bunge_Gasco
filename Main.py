@@ -10,6 +10,7 @@ import Toolbar as TL
 import Gameloop as GL
 import utils as UT
 import game_over_menu as GOM
+from utils import GAME_OVER
 
 # Ejecutamos menú principal antes del juego
 start_time, fullscreen = MM.main_menu()  
@@ -73,6 +74,7 @@ def main():
     run = True
     sun_counter = 5000
     font = pygame.font.Font("04B_03__.TTF", 35) 
+    
 
     frames = pygame.time.Clock()
 
@@ -98,7 +100,7 @@ def main():
                 run = False
             
             # Si pierde se abre la pantalla de 'game over'
-            elif event.type == UT.GAME_OVER:               
+            elif event.type == GAME_OVER:               
                 GOM.show_game_over(screen)   
                 run = False 
                 break
@@ -197,7 +199,7 @@ def main():
         counter_sprite = list(toolbar_group)[-1]
         counter_center = counter.get_rect(center=counter_sprite.rect.center)
         screen.blit(counter, (counter_center[0]+35, counter_center[1]+5))
-        frames.tick(60) # Limitar a 60 FPS
+        frames.tick(500) # Limitar a 60 FPS
         pygame.display.update()
         for plant in get_all_plants():
             print(plant.life)
