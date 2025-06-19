@@ -5,12 +5,12 @@ import os
 # ───────────────────────── helpers ──────────────────────────
 
 def _hover_color(col: tuple[int, int, int]) -> tuple[int, int, int]:
-    """Genera un color de hover perceptible. 
-    Si el color es muy brillante (ej.: amarillo puro), lo oscurece; 
+    """Genera un color de hover perceptible.
+    Si el color es muy brillante (ej.: amarillo puro), lo oscurece;
     si es medio/oscuro, lo aclara."""
     r, g, b = col
     bright = r + g + b > 600
-    delta  = 70  # intensidad de cambio
+    delta = 70  # intensidad de cambio
     if bright:
         g = max(g - delta, 0)
         b = max(b - delta, 0)
@@ -50,7 +50,7 @@ def main_menu():
 
     # fuentes (título más grande y grueso)
     title_font = pygame.font.Font("04B_03__.TTF", 90)
-    btn_font   = pygame.font.Font("04B_03__.TTF", 30)
+    btn_font = pygame.font.Font("04B_03__.TTF", 30)
 
     # sonidos
     pygame.mixer.music.load(os.path.join("Audio", "Main Menu - Plants vs. Zombies 2.mp3"))
@@ -60,16 +60,16 @@ def main_menu():
     fullscreen = False
 
     # textos precalculados
-    txt_play     = btn_font.render("Jugar",    True, (0, 0, 0))
-    txt_papapum  = btn_font.render("Papapum",  True, (0, 0, 0))
-    txt_full     = btn_font.render("Pantalla Completa", True, (0, 0, 0))
-    txt_window   = btn_font.render("Modo Ventana",      True, (0, 0, 0))
+    txt_play = btn_font.render("Jugar", True, (0, 0, 0))
+    txt_papapum = btn_font.render("Papapum", True, (0, 0, 0))
+    txt_full = btn_font.render("Pantalla Completa", True, (0, 0, 0))
+    txt_window = btn_font.render("Modo Ventana", True, (0, 0, 0))
 
     # tamaños de botones
-    btn_play_size    = (200, 60)
+    btn_play_size = (200, 60)
     btn_papapum_size = (350, 60)
-    btn_toggle_size  = (300, 50)
-    margin           = 20
+    btn_toggle_size = (300, 50)
+    margin = 20
 
     clock = pygame.time.Clock()
 
@@ -95,14 +95,18 @@ def main_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if btn_play_rect.collidepoint(event.pos):
-                    return start_time, fullscreen
+                    return ("classic", start_time), fullscreen
+
                 elif btn_papapum_rect.collidepoint(event.pos):
-                    return "papapum", fullscreen
+                    return ("papapum", None), fullscreen
+
                 elif btn_toggle_rect.collidepoint(event.pos):
                     fullscreen = not fullscreen
-                    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) if fullscreen else pygame.display.set_mode(default_dims)
+                    screen = pygame.display.set_mode(
+                        (0, 0), pygame.FULLSCREEN) if fullscreen else pygame.display.set_mode(default_dims)
 
         # ───── drawing ─────
         fondo = pygame.image.load("Images/pvz_udesa.jpeg").convert()
@@ -110,11 +114,11 @@ def main_menu():
         screen.blit(fondo, (0, 0))
 
         # título con sombra destacada
-        title_white  = title_font.render("Plants vs Zombies", True, (255, 255, 255))
+        title_white = title_font.render("Plants vs Zombies", True, (255, 255, 255))
         title_shadow = title_font.render("Plants vs Zombies", True, (0, 0, 0))
-        title_pos = title_white.get_rect(midtop=(width // 2, 80))
+        title_pos = title_white.get_rect(midtop=(width // 2, 40))
         screen.blit(title_shadow, title_pos.move(4, 4))
-        screen.blit(title_white,  title_pos)
+        screen.blit(title_white, title_pos)
 
         mouse_pos = pygame.mouse.get_pos()
 
