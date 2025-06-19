@@ -18,7 +18,7 @@ def show_game_over(screen):
         text_hint.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2 + 40))
     )
     pygame.display.flip()
-    pygame.mixer.music.load(os.path.join('Audio', "gameover.mp3"))
+    pygame.mixer.music.load(os.path.join('Audio', "game_over.mp3"))
     pygame.mixer.music.play()
     waiting = True
     while waiting:
