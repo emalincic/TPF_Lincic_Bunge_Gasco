@@ -1,11 +1,12 @@
 import pygame
 import Plants as PL
 
-# ACCION DE LA PLANTA
+# ACCION DE LA PALA
 def shovel_action(plants, pos):
     for plant in plants:
         if plant.rect.collidepoint(pos):
             return plant.remove()
+    return 0
 
 
 # QUE PLANTA FUE SELECCIONADA

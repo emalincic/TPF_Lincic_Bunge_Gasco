@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 import SUNS as SN
 import Plants as PL
 import zombies as ZB
@@ -13,7 +14,7 @@ import game_over_menu as GOM
 from utils import GAME_OVER
 
 # Ejecutamos menú principal antes del juego
-start_time, fullscreen = MM.main_menu()  
+start_time = MM.time_counter() 
 
 def main():
     # TODO Intizialize pygame
@@ -153,7 +154,7 @@ def main():
                 placement = UT.cell_center(10, 6, 'plant', pos)
 
                 # Se chequea si la pala recoge una planta
-                if selected_object == 'shovel_icon': 
+                if selected_object == 'shovel_icon' : 
                     sun_counter += GL.shovel_action(get_all_plants(), pos)
 
                 # Se chequea que no haya plantas donde se quiere ubicar la planta
@@ -204,5 +205,6 @@ def main():
         for plant in get_all_plants():
             print(plant.life)
     pygame.quit() 
+    sys.exit()
 
-main()
+# main()

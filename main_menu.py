@@ -1,7 +1,8 @@
 import pygame
 import sys
 import os
-
+import Main
+from Papapapapum import papapum
 # ───────────────────────── helpers ──────────────────────────
 
 def _hover_color(col: tuple[int, int, int]) -> tuple[int, int, int]:
@@ -38,6 +39,11 @@ def draw_button(surf: pygame.Surface, rect: pygame.Rect, bg_color: tuple[int, in
 
     # texto centrado
     surf.blit(text_surf, text_surf.get_rect(center=rect.center))
+    
+
+def time_counter():
+    start_time = pygame.time.get_ticks()
+    return start_time
 
 
 # ───────────────────────── main menu ─────────────────────────
@@ -61,7 +67,7 @@ def main_menu():
 
     # textos precalculados
     txt_play     = btn_font.render("Jugar",    True, (0, 0, 0))
-    txt_papapum  = btn_font.render("Papapum",  True, (0, 0, 0))
+    txt_papapum  = btn_font.render("Papapapapum",  True, (0, 0, 0))
     txt_full     = btn_font.render("Pantalla Completa", True, (0, 0, 0))
     txt_window   = btn_font.render("Modo Ventana",      True, (0, 0, 0))
 
@@ -74,7 +80,6 @@ def main_menu():
     clock = pygame.time.Clock()
 
     while True:
-        start_time = pygame.time.get_ticks()
         width, height = screen.get_size()
         center_y = int(height * 0.65)
 
@@ -97,15 +102,15 @@ def main_menu():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if btn_play_rect.collidepoint(event.pos):
-                    return start_time, fullscreen
+                    Main.main()
                 elif btn_papapum_rect.collidepoint(event.pos):
-                    return "papapum", fullscreen
+                    papapum()
                 elif btn_toggle_rect.collidepoint(event.pos):
                     fullscreen = not fullscreen
                     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) if fullscreen else pygame.display.set_mode(default_dims)
 
         # ───── drawing ─────
-        fondo = pygame.image.load("Images/pvz_udesa.jpeg").convert()
+        fondo = pygame.image.load(os.path.join('Images', 'pvz_udesa.png')).convert()
         fondo = pygame.transform.scale(fondo, (width, height))
         screen.blit(fondo, (0, 0))
 
@@ -133,4 +138,4 @@ def main_menu():
 
 
 if __name__ == "__main__":
-    print(main_menu())
+    main_menu()

@@ -134,7 +134,7 @@ class Pea(pygame.sprite.Sprite):
 class Spinning_Nut(Plants):
     def __init__(self, image_file, pos, cost=None, life=None, dims=(1200, 600)):
         super().__init__(image_file, pos, cost, life)
-        self.speed = 5
+        self.speed = 0
         cw, ch = UT.cell_size()
         self.dims = dims
         raw = pygame.image.load(image_file).convert_alpha()
@@ -144,6 +144,7 @@ class Spinning_Nut(Plants):
         self.angle = 0
         self.already_hit = False
     def ability(self):
+        self.speed = 5
         self.rect.x += self.speed
         self.angle -= 8
         self.image = pygame.transform.rotate(self.original_image, self.angle)
