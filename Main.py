@@ -80,7 +80,7 @@ def main():
     frames = pygame.time.Clock()
 
     # Llamada de los zombis incial 
-    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3') 
+    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
     pygame.mixer.music.play(0)
 
     toolbar_group, toolbar_group_ghost = TL.toolbar()
@@ -132,13 +132,13 @@ def main():
             
             # Eventos del mouse
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                for item in toolbar_group_ghost:
+                for item, item_ghost in zip(toolbar_group, toolbar_group_ghost):
                     if item.rect.collidepoint(event.pos):
-                        real_card = next(card for card in toolbar_group if card.key == item.key)
+                        real_card = next(card for card in toolbar_group if card.key == item_ghost.key)
                         # Si no se acabo el cooldown se puede seleccionar
                         if real_card.ready():           
                             selected_object = item.key
-                            dragging = item
+                            dragging = item_ghost
                             original_pos = dragging.rect.center
                         else:               
                             pass

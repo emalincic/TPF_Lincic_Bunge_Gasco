@@ -1,8 +1,10 @@
+import os
 import pygame
 import random
 import utils as UT
 from utils import GAME_OVER
 
+pygame.mixer.init()
 class Zombies(pygame.sprite.Sprite):
     def __init__(self, zombie_type, random_z: str):
         super().__init__()
@@ -14,12 +16,9 @@ class Zombies(pygame.sprite.Sprite):
         self.id = random.randint(0, 100000)
         self.type = random_z
         self.start_time = pygame.time.get_ticks()
-
-        if zombie_type.get("habilidad"):
-            clase_hab = globals()[zombie_type["habilidad"]]
-            self.hability = clase_hab(self)
-        else:
-            self.hability = None
+        self.eating_sound = pygame.mixer.Sound(os.path.join('Audio', 'zombies eating sound.mp3'))
+        self.Channel = pygame.mixer.Channel(0)
+        self.eating = False
         
 
         raw = pygame.image.load(self.image).convert_alpha()
@@ -51,7 +50,12 @@ class Zombies(pygame.sprite.Sprite):
             self.speed = max(0.5, UT.cell_size()[0] / 240)
         if self.health <= 0:
             self.kill()
-
+    
+    def sound(self):
+        if self.eating:
+            self.Channel.play(self.eating_sound, loops=-1)
+        else:
+            self.Channel.stop()
     def ready_to_hit(self):
         if not hasattr(self, "_ready_time"):
             self._ready_time = pygame.time.get_ticks()

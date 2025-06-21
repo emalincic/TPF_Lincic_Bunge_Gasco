@@ -45,10 +45,8 @@ class SelectableItem(pygame.sprite.Sprite):
             left  = self.cooldown_end - now        
             ratio = left / UT.SEED_COOLDOWN         
 
-           
             self.image = self.base_image.copy()
 
-           
             shade = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
             shade.fill((0, 0, 0, int(160 * ratio)))   
             self.image.blit(shade, (0, 0))
@@ -94,6 +92,9 @@ def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
         ("PS_seedpacket.png", "peashooter_icon", "Peashooter.png"),
         ("NT_seedpacket.png", "nut_icon", "Nut.png"),
         ("SH_seedpacket.png", "shovel_icon", "shovel_ghost.png"),
+        ("CB_seedpacket.png", "cherry_icon", "Cherry.png"),
+        ("BM_seedpacket.png", "boomerang_icon", "boomerang_plant.png"),
+        ("PM_seedpacket.png", "papapum_icon", "papapum_load.png")
     ]:
         seed_img = _load_scaled(seed_file, seed_size)
         toolbar_group.add(SelectableItem(seed_img, key))

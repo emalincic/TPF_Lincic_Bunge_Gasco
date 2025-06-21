@@ -1,7 +1,8 @@
 import pygame
 import utils as UT
 import SUNS as SN
-
+import os
+pygame.mixer.init()
 class Plants(pygame.sprite.Sprite):
     """
     Clase padre de las plantas (hereda atributos de clase sprite.Sprtie de pygame). 
@@ -101,11 +102,13 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
             self.rect.move_ip(-2, 0)
             if self.rect.centerx == self.original[0]:
                 self.kill()
-
 class PeaShotter(Plants):
     def __init__(self, image_file, pos, pea_file, cost=100, life=300):
         super().__init__(image_file, pos, cost, life)
         self.pea_file = pea_file
+        self.shooting_sound = pygame.mixer.Sound(os.path.join('Audio', 'zombies eating sound.mp3'))
+        self.Channel = pygame.mixer.Channel(1)
+        self.shooting = False
     def ability(self, zombies):
         if not any(z.cy == self.pos[1] for z in zombies):
             return None, None
@@ -138,18 +141,23 @@ class Spinning_Nut(Plants):
         cw, ch = UT.cell_size()
         self.dims = dims
         raw = pygame.image.load(image_file).convert_alpha()
-        self.image = pygame.transform.scale(raw, (cw, ch))
-        self.original_image = pygame.transform.scale(raw, (cw, ch))
+        self.image = pygame.transform.scale(raw, (cw - 10, ch - 10))
+        self.original_image = pygame.transform.scale(raw, (cw - 10, ch - 10))
         self.rect = self.image.get_rect(midright=pos)
+        self.pos = pygame.Vector2(self.rect.center)  # posición flotante precisa
         self.angle = 0
         self.already_hit = False
+
     def ability(self):
         self.speed = 5
-        self.rect.x += self.speed
+        self.pos.x += self.speed  # movimiento con precisión flotante
         self.angle -= 8
+
+        # rotar imagen
         self.image = pygame.transform.rotate(self.original_image, self.angle)
-        self.rect = self.image.get_rect(center=self.rect.center)
-        if self.rect.x >= self.dims[0]:
+        self.rect = self.image.get_rect(center=self.pos)  # usar pos exacta como centro
+
+        if self.rect.left >= self.dims[0]:
             self.kill()
 
 class cherry(Plants):
@@ -202,20 +210,18 @@ class Lawnmower(pygame.sprite.Sprite):
         self.speed = 0
         self.active = False
         self._screen_width = pygame.display.get_surface().get_width()
+
     def movement(self, zombies: pygame.sprite.Group) -> None:
         
-
         if not self.active:
-            
             if pygame.sprite.spritecollideany(self, zombies):
                 self.active = True
                 self.speed = max(6, UT.cell_size()[0] // 20)
+
         else:
-          
             self.rect.x += self.speed
             pygame.sprite.spritecollide(self, zombies, True)
 
-        
             if self.rect.left > self._screen_width + self.rect.width:
                 self.kill()
 

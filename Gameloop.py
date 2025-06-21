@@ -1,3 +1,4 @@
+import os
 import pygame
 import Plants as PL
 
@@ -66,12 +67,16 @@ def udpate_zombies(zombies, plants, peas_group, boomerangs_bullet_group, screen)
         zombie_center = zombie.rect.center
         collided_plants = [plant for plant in plants if plant.rect.collidepoint(zombie_center)]
         if collided_plants and zombie.type != 'balloon':
+            zombie.eating = True
+            zombie.sound()
             for plant in collided_plants:
                 if zombie.ready_to_hit():
                     plant.take_damage(100)
                     zombie.ready_to_hit()
         else:
+            zombie.eating = False
             zombie.movement()  
+        
         screen.blit(zombie.surf, zombie.rect)
         if pygame.sprite.spritecollide(zombie, peas_group, True):
             zombie.selfdamage()
@@ -136,12 +141,15 @@ def update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, scree
         screen.blit(nut_placed.image, nut_placed.rect)
 
 def update_zombies_papum(nuts_group, zombies, screen):
+    for nut in nuts_group:
+        nut.ability()
+
     for zombie in zombies:
         zombie.movement()  
         screen.blit(zombie.surf, zombie.rect)
         zombie_center = zombie.rect.center
+
         for nut in nuts_group:
-            nut.ability()
             if nut.rect.collidepoint(zombie_center) and not nut.already_hit:
                 zombie.selfdamage(500) 
                 nut.already_hit = True
@@ -151,6 +159,7 @@ def nut_placement(placement, nuts_group, nuts_toolbar_group):
     if placement:
         nut_placed = PL.Spinning_Nut('Images/Nut.png', placement)
         nuts_group.add(nut_placed)
+
     for nuts in nuts_toolbar_group:
         if placement:
             nuts.kill()

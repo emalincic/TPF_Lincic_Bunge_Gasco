@@ -91,6 +91,24 @@ def cell_center(cols, rows, key, pos=None):
         cx = col * cell_width + cell_width // 2
         cy = row * cell_height + cell_height // 2
         return (cx, cy)
+    elif key == 'boomerang_icon':
+        col = 5
+        row = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'cherry_icon':
+        col = 6
+        row = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
+    elif key == 'papapum_icon':
+        col = 7
+        row = 0
+        cx = col * cell_width + cell_width // 2
+        cy = row * cell_height + cell_height // 2
+        return (cx, cy)
     elif key == 'suncounter_icon':
         row = 0
         col = 0.5

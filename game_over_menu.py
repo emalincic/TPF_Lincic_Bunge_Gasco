@@ -19,7 +19,7 @@ def show_game_over(screen):
     )
     pygame.display.flip()
     pygame.mixer.music.load(os.path.join('Audio', "The Zombies Ate Your Brains! - Player's House - Plants vs. Zombies 2.mp3"))
-    pygame.mixer.music.play()
+    pygame.mixer.music.play(0)
     waiting = True
     while waiting:
         for ev in pygame.event.get():
