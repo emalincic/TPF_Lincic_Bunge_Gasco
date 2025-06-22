@@ -49,8 +49,10 @@ def main():
     dims   = screen.get_size()             # (ancho, alto) actuales
     pygame.display.set_caption('Plants vs Zombies')
 
-    # Creamos el mapa según la imagen
-    mapa = UT.Background('Images/mapa.jpg', [0, 0], screen)
+    # Partes del fonde
+    marco, claro, oscuro = UT.background_squares(screen, 10, 6, 'Images/marco_marron.png', 
+                                                 'Images/celda_verde_claro.png', 'Images/celda_verde_oscuro.png')
+    mapa = UT.Background('Images/fondo_pvz.png', [0, 0], screen)
 
     # Evento personalizado para los soles
     SUN_EVENT = pygame.USEREVENT + 1
@@ -176,10 +178,10 @@ def main():
             elif event.type == pygame.MOUSEMOTION and dragging:
                 dragging.rect.center = (event.pos)
 
-        
+
         # ACTUALIZACIÓN DE OBJETOS
         # Dibujar grilla 10x6 dinámica
-        GL.update_grid(10, 6, screen)
+        GL.update_grid(10, 6, screen, marco, oscuro, claro)
         # Actualizamos la posicion de los guisantes
         GL.update_peas(peas_group, boomerangs_bullet_group, screen)
         # Actualizamos acciones de las plantas
@@ -202,9 +204,7 @@ def main():
         screen.blit(counter, (counter_center[0]+35, counter_center[1]+5))
         frames.tick(60) # Limitar a 60 FPS
         pygame.display.update()
-        for plant in get_all_plants():
-            print(plant.life)
     pygame.quit() 
     sys.exit()
 
-# main()
+#main()

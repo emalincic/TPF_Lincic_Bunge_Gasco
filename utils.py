@@ -9,6 +9,7 @@ def cell_size():
         return 0, 0
     w, h = surface.get_size()
     return w // COLS, h // ROWS
+
 # Clase background
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location, screen):
@@ -36,10 +37,26 @@ def mouses(mouse_open, mouse_clicked):
     mouse_pressed = pygame.cursors.Cursor((0, 0), cursor_pressed)
     return mouse_opened, mouse_pressed
 
+# Partes del fondo
+def background_squares(screen, cols, rows, image_banner, image_light_square, image_dark_square):
+    width, height = screen.get_size()    # ancho y alto actuales
+    cell_width  = width  // cols
+    cell_height = height // rows
+
+    banner = pygame.image.load(image_banner)
+    scaled_banner = pygame.transform.scale(banner, (cell_width, cell_height))
+
+    dark_square = pygame.image.load(image_light_square).convert_alpha()
+    scaled_light_square = pygame.transform.scale(dark_square, (cell_width, cell_height))
+
+    light_square = pygame.image.load(image_dark_square).convert_alpha()
+    scaled_dark_square = pygame.transform.scale(light_square, (cell_width, cell_height))
+    return scaled_banner, scaled_light_square, scaled_dark_square
+
+# Funcion para el poscionamiento de los objetos (funcion universal)
 def cell_center(cols, rows, key, pos=None):
     # ← llamamos cada vez
     cell_width, cell_height = cell_size()
-
     if key == 'plant': #Falta terminar
         col = pos[0] // cell_width
         row = pos[1] // cell_height
@@ -47,7 +64,6 @@ def cell_center(cols, rows, key, pos=None):
             return None
         return (col * cell_width + cell_width // 2,
                 row * cell_height + cell_height // 2)
-
     elif key == 'sun':
         col = randint(1, cols - 2)
         row = randint(1, rows - 1)
@@ -55,18 +71,15 @@ def cell_center(cols, rows, key, pos=None):
         cell_y = row * cell_height
         return (randint(cell_x, cell_x + cell_width - 1),
                 randint(cell_y, cell_y + cell_height - 1))
-
     elif key == 'lawnmower':
         row = pos
         return (cell_width // 2,
                 row * cell_height + cell_height // 2)
-
     elif key == 'zombie':
         row = randint(1, rows - 1)
         screen_w = pygame.display.get_surface().get_width()
         return (screen_w + 50,
                 row * cell_height + cell_height // 2)
-
     elif key == 'shovel_icon':
         col = 9
         row = 0

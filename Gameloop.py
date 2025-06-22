@@ -96,18 +96,33 @@ def update_lawnmowers(lawnmowers, zombies, screen):
         mower.movement(zombies)
         screen.blit(mower.image, mower.rect)
 
-def update_grid(cols, rows, screen):
+def update_grid(cols, rows, screen, marco, celda_oscura, celda_clara):
     screen.fill((50, 120, 50))  # Fondo verde (opcional)
     width, height = screen.get_size()    # ancho y alto actuales
     cell_width  = width  // cols
     cell_height = height // rows
+
+
+    # marco = pygame.image.load('Images/marco_marron.png')
+    # marco_escalado = pygame.transform.scale(marco, (cell_width, cell_height))
+    # celda_oscura_img = pygame.image.load('Images/celda_verde_oscuro.png').convert_alpha()
+    # celda_oscuro_escalada = pygame.transform.scale(celda_oscura_img, (cell_width, cell_height))
+    # celda_clara_img = pygame.image.load('Images/celda_verde_claro.png').convert_alpha()
+    # celda_clara_escalada = pygame.transform.scale(celda_clara_img, (cell_width, cell_height))
+
     for i in range(cols):
         for j in range(rows):
-            rect = pygame.Rect(i * cell_width,
-                            j * cell_height,
-                            cell_width,
-                            cell_height)
-            pygame.draw.rect(screen, (0, 100, 0), rect, 2)
+            if j == 0:
+                screen.blit(marco, (i*cell_width, j*cell_height))
+            elif (i + j) % 2 == 0:
+                screen.blit(celda_clara, (i*cell_width, j*cell_height))
+            else:
+                screen.blit(celda_oscura, (i*cell_width, j*cell_height))
+            #rect = pygame.Rect(i * cell_width,
+                #            j * cell_height,
+              #              cell_width,
+              #              cell_height)
+            #pygame.draw.rect(screen, (0, 100, 0), rect, 2)
 
 # ============================
 # UPDATES FOR PAPAPAPAPUM MODE
