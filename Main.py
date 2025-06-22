@@ -50,8 +50,11 @@ def main():
     pygame.display.set_caption('Plants vs Zombies')
 
     # Partes del fonde
-    marco, claro, oscuro = UT.background_squares(screen, 10, 6, 'Images/marco_marron.png', 
-                                                 'Images/celda_verde_claro.png', 'Images/celda_verde_oscuro.png')
+    marco, claro, oscuro = UT.background_squares(
+        screen, 10, 6, 'Images/marco_marron.png', 
+        'Images/celda_verde_claro.png', 
+        'Images/celda_verde_oscuro.png')
+    
     mapa = UT.Background('Images/fondo_pvz.png', [0, 0], screen)
 
     # Evento personalizado para los soles
@@ -60,7 +63,7 @@ def main():
 
     # Eventos de los zombies
     ADDZOMBIE = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDZOMBIE, random.choice([5000, 7000, 9000]))
+    pygame.time.set_timer(ADDZOMBIE, random.choice([5000, 8000, 9000]))
     database = DB.Zombie_types
     is_flag = True
     # Game Over
@@ -116,7 +119,7 @@ def main():
             # Se agrega zombi si se cumple el evento
             elif event.type == ADDZOMBIE:
                 # Oleada de zombies continuea
-                if (current_time - start_time) // 1000 >= 100 and is_flag: #! REVISAR TIEMPO DE OLEADA
+                if (current_time - start_time) // 1000 >= 150 and is_flag:
                         flag = ZB.Zombies(DB.Zombie_types['flag'], 'flag') # zombi bandera (marca oleada)
                         zombies.add(flag)                       
                         pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')

@@ -25,9 +25,15 @@ def papapum():
     # screen = pygame.display.get_surface()  # ← no crea otra
     # dims   = screen.get_size()   
     pygame.display.set_caption('Plants vs Zombies')
+    
+    # Partes del fonde
+    marco, claro, oscuro = UT.background_squares(
+        screen, 10, 6, 'Images/marco_marron.png', 
+        'Images/celda_verde_claro.png', 
+        'Images/celda_verde_oscuro.png')
 
     ADDZOMBIE = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDZOMBIE, choice([3000, 4000, 5000]))
+    pygame.time.set_timer(ADDZOMBIE, choice([4000, 5000]))
     is_flag = True
     database = DB.Zombie_types
 
@@ -35,15 +41,8 @@ def papapum():
     pygame.time.set_timer(ADDNUT, choice([7000, 8000, 10000]))
 
 
-    cursor_opended = pygame.image.load('Images/Mouse.png').convert_alpha()
-    cursor_opended = pygame.transform.scale(cursor_opended, (40, 40))
-
-    cursor_pressed = pygame.image.load('Images/Mouse_click.png').convert_alpha()
-    cursor_pressed = pygame.transform.scale(cursor_pressed, (40, 40))
-
-    mouse_opened = pygame.cursors.Cursor((0, 0), cursor_opended)
-    mouse_pressed = pygame.cursors.Cursor((0, 0), cursor_pressed)
-
+    # Obtenemos los estilos del mouse
+    mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
     pygame.mouse.set_cursor(mouse_opened)
 
     run = True
@@ -58,9 +57,7 @@ def papapum():
 
     seed_size = (int(cell_h * 1.10), int(cell_h))
 
-    selected_object = None
     dragging = None
-    was_placed = False
     while run:
         events = pygame.event.get()
         current_time = pygame.time.get_ticks()
@@ -74,13 +71,14 @@ def papapum():
                 run = False
             
             elif event.type == ADDZOMBIE:
-                if (current_time) // 1000 >= 100 and is_flag:
+                if (current_time) // 1000 >= 150 and is_flag:
                         flag = ZB.Zombies(DB.Zombie_types['flag'], 'flag')
                         zombies.add(flag)
                         
                         pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
                         pygame.mixer.music.play(0)
                         pygame.time.set_timer(ADDZOMBIE, choice([1500, 2000, 2500]))
+                        pygame.time.set_timer(ADDNUT, choice([4000, 5000, 6000]))
                         is_flag = False 
                         
                 random_z = choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
@@ -115,7 +113,7 @@ def papapum():
         
         # SE ACTUALIZAN LOS OBJETOS
         # Dibujar grilla 10x6 dinámica
-        GL.update_grid(10, 6, screen)
+        GL.update_grid(10, 6, screen, marco, oscuro, claro)
         # Actualizamos acciones de las plantas
         belt_group.draw(screen)
         GL.update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, screen, dragging)

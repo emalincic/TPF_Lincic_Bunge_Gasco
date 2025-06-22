@@ -323,7 +323,7 @@ class Spinning_Nut(Plants):
         Clase para la habilidad de la Nuez giratoria. Cada vez que se llama avanca a la Nuez.
         Cuando llega al final del trayecto es eliminada.   
         """
-        self.speed = 5
+        self.speed = 7
         self.pos.x += self.speed  # movimiento con precisión flotante
         self.angle -= 8
 
