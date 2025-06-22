@@ -75,7 +75,7 @@ def main():
 
 
     run = True
-    sun_counter = 5000
+    sun_counter = 50
     font = pygame.font.Font("04B_03__.TTF", 35) 
     
 

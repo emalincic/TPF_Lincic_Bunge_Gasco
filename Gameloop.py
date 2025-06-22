@@ -12,6 +12,7 @@ def shovel_action(plants, pos):
 
 # QUE PLANTA FUE SELECCIONADA
 def plant_placement(selected_object, sun_counter, placement, pea_shooters_group, sunflowers, nuts_group, cherry_group, papapum_group, boomerangs_group):
+    cost = 0
     if selected_object == 'peashooter_icon' and sun_counter >= 100:
         plant_placed = PL.PeaShotter('Images/Peashooter.png', placement, 'Images/Pea.png')
         pea_shooters_group.add(plant_placed)
@@ -24,10 +25,10 @@ def plant_placement(selected_object, sun_counter, placement, pea_shooters_group,
         plant_placed = PL.Nut('Images/Nut.png', placement)
         nuts_group.add(plant_placed)
         cost = 50 
-    elif selected_object == 'cherry_icon' and sun_counter >= 200:
+    elif selected_object == 'cherry_icon' and sun_counter >= 150:
         plant_placed = PL.cherry('Images/Cherry.png', placement)
         cherry_group.add(plant_placed)
-        cost = 200
+        cost = 150
     elif selected_object == 'papapum_icon' and sun_counter >= 25:
         plant_placed = PL.Papapum('Images/papapum_unload.png', 'Images/papapum_load.png', placement)
         papapum_group.add(plant_placed)
