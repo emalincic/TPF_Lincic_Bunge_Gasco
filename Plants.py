@@ -358,9 +358,8 @@ class Lawnmower(pygame.sprite.Sprite):
 
     def movement(self, zombies: pygame.sprite.Group):
         """
-        Funcion que activa el movimiento de la podadora cuando un zombi
-        entra en contacto con ella. Si se encuentra un zombi en su camino
-        lo elimina inmediatamente.
+        Funcion que activa el movimiento de la podadora cuando un zombi entra en contacto 
+        con ella. Si se encuentra un zombi en su camino lo elimina inmediatamente.
         """
         if not self.active:
             if pygame.sprite.spritecollideany(self, zombies):
