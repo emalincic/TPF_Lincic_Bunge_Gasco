@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 import sys
@@ -6,12 +7,12 @@ import Plants as PL
 import zombies as ZB
 import zombies as ZB
 import main_menu as MM
-import DataBase as DB
 import Toolbar as TL
 import Gameloop as GL
 import utils as UT
 import game_over_menu as GOM
 from utils import GAME_OVER
+import json
 
 # Ejecutamos menú principal antes del juego
 start_time = MM.time_counter() 
@@ -34,6 +35,9 @@ def main():
     #* Grupon de los Zombies
     zombies = pygame.sprite.Group()
 
+    lawnmowers = PL.add_lawnmowers(10, 6)
+    toolbar_group, toolbar_group_ghost = TL.toolbar()
+
 
     def get_all_plants() -> list:
         """
@@ -46,7 +50,6 @@ def main():
     
     # Creamos ventana
     screen = pygame.display.get_surface()  # ← no crea otra
-    dims   = screen.get_size()             # (ancho, alto) actuales
     pygame.display.set_caption('Plants vs Zombies')
 
     # Partes del fonde
@@ -55,8 +58,6 @@ def main():
         'Images/celda_verde_claro.png', 
         'Images/celda_verde_oscuro.png')
     
-    mapa = UT.Background('Images/fondo_pvz.png', [0, 0], screen)
-
     # Evento personalizado para los soles
     SUN_EVENT = pygame.USEREVENT + 1
     pygame.time.set_timer(SUN_EVENT, 10000)
@@ -64,20 +65,16 @@ def main():
     # Eventos de los zombies
     ADDZOMBIE = pygame.USEREVENT + 2
     pygame.time.set_timer(ADDZOMBIE, random.choice([5000, 8000, 9000]))
-    database = DB.Zombie_types
-    is_flag = True
-    # Game Over
-    #GAME_OVER = 
-    # Obtenemos las lawnmowers
-    lawnmowers = PL.add_lawnmowers(10, 6)
+    with open("DataBase.json") as file:
+        database = json.load(file)
+    
 
     # Obtenemos los estilos del mouse
     mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
     pygame.mouse.set_cursor(mouse_opened)
 
 
-
-    run = True
+    
     sun_counter = 50
     font = pygame.font.Font("04B_03__.TTF", 35) 
     
@@ -88,8 +85,10 @@ def main():
     pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
     pygame.mixer.music.play(0)
 
-    toolbar_group, toolbar_group_ghost = TL.toolbar()
+    
 
+    is_flag = False
+    run = True
     selected_object = None
     dragging = None
     while run:
@@ -119,13 +118,14 @@ def main():
             # Se agrega zombi si se cumple el evento
             elif event.type == ADDZOMBIE:
                 # Oleada de zombies continuea
-                if (current_time - start_time) // 1000 >= 150 and is_flag:
-                        flag = ZB.Zombies(DB.Zombie_types['flag'], 'flag') # zombi bandera (marca oleada)
+                # CHE EMA
+                if (current_time - start_time) // 1000 >= 150 and not is_flag:
+                        flag = ZB.Zombies(database['flag'], 'flag') # zombi bandera (marca oleada)
                         zombies.add(flag)                       
-                        pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
+                        pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
                         pygame.mixer.music.play(0)
                         pygame.time.set_timer(ADDZOMBIE, random.choice([2500, 3000, 3500]))
-                        is_flag = False 
+                        is_flag = True 
 
                 # Se agrega zombi random
                 random_z = random.choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
@@ -209,5 +209,3 @@ def main():
         pygame.display.update()
     pygame.quit() 
     sys.exit()
-
-#main()

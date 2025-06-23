@@ -1,0 +1,32 @@
+{
+    "Normal": {
+        "health": 190,
+        "speed": 0.5,
+        "image": ["zombie_normal.png"],
+        "probability": 0.8
+    },
+    "Cone": {
+        "health": 560,
+        "speed": 0.5,
+        "image": ["mati_zomcaccia.png"],
+        "probability": 0.4
+    },
+    "bucket": {
+        "health": 1290,
+        "speed": 0.5,
+        "image": ["zombie_bucket.png"],
+        "probability": 0.3
+    },
+    "balloon": {
+        "health": 900,
+        "speed": 0.75,
+        "image": ["Balloonzombie.png", "Balloonzombie2.png"],
+        "probability": 0.1
+    },
+    "flag" : {
+        "health": 190,
+        "speed": 0.5,
+        "image": ["zombie_flag.png"],
+        "probability": 0
+    }
+}

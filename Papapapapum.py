@@ -1,42 +1,42 @@
 import pygame
 import sys
 from random import choice, choices
-import DataBase as DB
 import Gameloop as GL
-# import Borrador as BR
 import Toolbar as TL
-# import main_menu as MM
 import zombies as ZB
 import utils as UT
+import game_over_menu as GOM
+from utils import GAME_OVER
+import json
 
-# Ejecutamos menú principal antes del juego
-# start_time, fullscreen = MM.main_menu() 
-# TODO Intizialize pygame
+# Intizialize pygame
 def papapum():
     pygame.init()
-
-
-    default_dims = (1200, 600)
-    screen = pygame.display.set_mode(default_dims)
-    belt_group, nuts_toolbar_group, nuts_group_ghost = TL.special_delivery()
-    nuts_group = pygame.sprite.Group()
-    #* Grupon de los Zombies
-    zombies = pygame.sprite.Group()
-    # screen = pygame.display.get_surface()  # ← no crea otra
-    # dims   = screen.get_size()   
+    # Creamos ventana
+    screen = pygame.display.get_surface()  # ← no crea otra
     pygame.display.set_caption('Plants vs Zombies')
+
+    # Sprites Groups de la cinta transportadora y los seed packets de la nuez
+    belt_group, nuts_toolbar_group, nuts_group_ghost = TL.special_delivery()
+    #Grupo de las nueces al momento de lanzarse
+    nuts_group = pygame.sprite.Group()
+    # Grupo de los Zombies
+    zombies = pygame.sprite.Group()
     
-    # Partes del fonde
+    # Partes del fondo
     marco, claro, oscuro = UT.background_squares(
         screen, 10, 6, 'Images/marco_marron.png', 
         'Images/celda_verde_claro.png', 
         'Images/celda_verde_oscuro.png')
 
+    # Evento personalizado para la aparición de zombies
     ADDZOMBIE = pygame.USEREVENT + 2
     pygame.time.set_timer(ADDZOMBIE, choice([4000, 5000]))
-    is_flag = True
-    database = DB.Zombie_types
+    # Utilización de la base de datos de los zombies
+    with open("DataBase.json") as file:
+        database = json.load(file)
 
+    # Evento personalizado para la aparición de nueces (seed packets)
     ADDNUT = pygame.USEREVENT + 3
     pygame.time.set_timer(ADDNUT, choice([7000, 8000, 10000]))
 
@@ -45,41 +45,48 @@ def papapum():
     mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
     pygame.mouse.set_cursor(mouse_opened)
 
-    run = True
-
-    frames = pygame.time.Clock()
-        
-    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3') 
-    pygame.mixer.music.play(0)
+    
 
     cell_w, cell_h = UT.cell_size()
-
-
     seed_size = (int(cell_h * 1.10), int(cell_h))
 
+    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3') 
+    pygame.mixer.music.play(0)
+    
+    frames = pygame.time.Clock()
+    is_flag = False
+    run = True
     dragging = None
     while run:
         events = pygame.event.get()
         current_time = pygame.time.get_ticks()
+
         for event in events:
+            # Mouse abierto o mouse cerrado
             if pygame.mouse.get_pressed()[0]:
                 pygame.mouse.set_cursor(mouse_pressed)
             else:
                 pygame.mouse.set_cursor(mouse_opened)
-                
+            # Si cierra la ventana se cierra el juego
             if event.type == pygame.QUIT:
                 run = False
+
+            # Si pierde se abre la pantalla de 'game over'
+            elif event.type == GAME_OVER:               
+                GOM.show_game_over(screen)   
+                run = False 
+                break
             
             elif event.type == ADDZOMBIE:
-                if (current_time) // 1000 >= 150 and is_flag:
-                        flag = ZB.Zombies(DB.Zombie_types['flag'], 'flag')
+                if (current_time) // 1000 >= 150 and not is_flag:
+                        flag = ZB.Zombies(database['flag'], 'flag')
                         zombies.add(flag)
                         
                         pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
                         pygame.mixer.music.play(0)
                         pygame.time.set_timer(ADDZOMBIE, choice([1500, 2000, 2500]))
                         pygame.time.set_timer(ADDNUT, choice([4000, 5000, 6000]))
-                        is_flag = False 
+                        is_flag = True 
                         
                 random_z = choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
                 its_time_for_zombies = ZB.Zombies(database[random_z], random_z)
@@ -127,4 +134,3 @@ def papapum():
     pygame.quit() 
     sys.exit()
 
-# papapum()

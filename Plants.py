@@ -121,7 +121,7 @@ class Boomerang(Plants):
             return None, None
         if self.ready is None:       # Se empieza timer para disparar un proyectil
             self.ready = pygame.time.get_ticks() 
-        elif pygame.time.get_ticks() - self.ready >= 1400: # Se resta tiempo actual a tiempo desde el ultimo disparo
+        elif pygame.time.get_ticks() - self.ready >= 1500: # Se resta tiempo actual a tiempo desde el ultimo disparo
             new_boomerang = Boomerang_Bullet(self.boomerang_file, self.pos)   # Proyectil 
             self.ready = None
             return new_boomerang, 'boomerang'
@@ -144,7 +144,7 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(raw, (size, size)) # Se ajustan las dimensiones del objeto a la ventana
         self.x, self.y = pos
         self.rect = self.image.get_rect(center=(self.x, self.y)) # Se define el rect del objeto y su posicon
-        self.speed = max(6, cw // 20) #! PARA QUE SE USA ESTO?
+        self.speed = max(4, cw // 20) #! PARA QUE SE USA ESTO?
         self.original = pos         
         self.final = UT.cell_center(10, 6, 'boomerang_range', self.original[1])         # Definimos rango del proyectil
         # Estados para ver si avanza o retrocede
@@ -158,14 +158,14 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
         los zombis en la fila.
         """
         if self.foward:
-            self.rect.move_ip(2, 0)
+            self.rect.x += self.speed
             if self.rect.centerx == self.final[0]: 
                 # Cuando llega al final se invierten los valores de movimiento
                 self.foward = False
                 self.backward = True
                 self.already_hit_zombies = [] # Se resetean los zombis que ya golpeo para poder golpearlos mientras retrocede
-        elif self.backward:
-            self.rect.move_ip(-2, 0)
+        elif self.backward: 
+            self.rect.x -= self.speed
             # Cuando vuelve a su posicion original se elimina el objeto
             if self.rect.centerx == self.original[0]:
                 self.kill() 
@@ -221,12 +221,12 @@ class Pea(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(raw, (size, size)) # Se dimensiona la imagen
         self.x, self.y = pos
         self.rect = self.image.get_rect(center=(self.x, self.y - int(ch * 0.25))) # Se obtiene el rect del guisante
-        self.speed = max(6, cw // 20) #! LO MISMO ACA QUE ES ESTO
+        self.speed = max(4, cw // 20) #! LO MISMO ACA QUE ES ESTO
     def shoot(self):
         """
         Metodo que avanca la posicion del guisante
         """
-        self.rect.move_ip(2, 0)
+        self.rect.x += self.speed
 
 # 5. Cereza Bomba
 class cherry(Plants):

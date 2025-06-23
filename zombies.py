@@ -11,7 +11,7 @@ class Zombies(pygame.sprite.Sprite):
         self.zombie_type = zombie_type
         self.health = zombie_type["health"]
         self.speed = zombie_type["speed"]
-        self.image = zombie_type["image"][0]
+        self.image = os.path.join("Images", zombie_type["image"][0])
         self.max_health = zombie_type["health"]
         self.id = random.randint(0, 100000)
         self.type = random_z
@@ -40,9 +40,9 @@ class Zombies(pygame.sprite.Sprite):
         self.health -= dmg
         if self.health < self.max_health * 0.4:
             try:
-                self.image = self.zombie_type["image"][1]
+                self.image = os.path.join("Images", self.zombie_type["image"][1])
             except IndexError:
-                self.image = self.zombie_type["image"][0]
+                self.image = os.path.join("Images", self.zombie_type["image"][0])
             raw = pygame.image.load(self.image).convert_alpha()
             c_w, c_h = UT.cell_size()
             self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))

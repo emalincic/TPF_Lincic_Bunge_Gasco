@@ -1,32 +1,35 @@
 import pygame
 from random import randint
-COLS, ROWS = 10, 6
+
+
+
+# COLS, ROWS = 10, 6
+#! ESTO PORQUE ESTA ACA?
 GAME_OVER = pygame.USEREVENT + 3
 SEED_COOLDOWN = 5_000  
-def cell_size():
+def cell_size(COLS=10, ROWS=6) -> tuple:
+    """
+    Funcion utilizada para calcular el tamaño de las celdas. 
+    """
     surface = pygame.display.get_surface()
     if surface is None:        
         return 0, 0
     w, h = surface.get_size()
     return w // COLS, h // ROWS
 
-# Clase background
-class Background(pygame.sprite.Sprite):
-    def __init__(self, image_file, location, screen):
-        super().__init__()
-        self.screen  = screen
-        self.source  = image_file
-        self.location = location
-        self.update_image()                       # ← primera carga
-
-    def update_image(self):
-        w, h = self.screen.get_size()
-        raw   = pygame.image.load(self.source).convert()
-        self.image = pygame.transform.scale(raw, (w, h))
-        self.rect  = self.image.get_rect(topleft=self.location)
-
 # Estilo del mouse:
-def mouses(mouse_open, mouse_clicked):
+def mouses(mouse_open: str, mouse_clicked: str) -> pygame.cursors.Cursor:
+    """
+    La funcion recibe como entradas las imagenes correspondientes al mouse siendo clickeado
+    y si no es clickeado. Se dimensionan las imagenes y se transforma el cursor usando
+    clases de pygame.
+    Entradas:
+        1. mouse_open (str): ruta de la imagen del mouse abierto
+        2. mouse_clicked (str): ruta de la imagen del mouse clickeado
+    Returns:
+        1. mouse_opened (pygame.cursors.Cursor): objeto de la clase cursors.Cursor
+        2. mouse_pressed (pygame.cursors.Cursor): objeto de la clase cursors.Cursor
+    """
     cursor_opended = pygame.image.load(mouse_open).convert_alpha()
     cursor_opended = pygame.transform.scale(cursor_opended, (40, 40))
 
@@ -35,14 +38,32 @@ def mouses(mouse_open, mouse_clicked):
 
     mouse_opened = pygame.cursors.Cursor((0, 0), cursor_opended)
     mouse_pressed = pygame.cursors.Cursor((0, 0), cursor_pressed)
+    print(type(mouse_opened))
     return mouse_opened, mouse_pressed
 
 # Partes del fondo
-def background_squares(screen, cols, rows, image_banner, image_light_square, image_dark_square):
+def background_squares(screen: pygame.surface.Surface, cols: int, rows: int, image_banner: str, 
+                       image_light_square: str, image_dark_square: str) -> pygame.surface.Surface:
+    """
+    Funcion destinada a transformar las imagenes para las celdas claras, oscuras y el marco (parte superior).
+    Se dimensionan las celdas acorde a las dimensiones de la pantalla. Se retoran las superficies para los
+    3 tipos de celdas.
+    Entradas:
+        1. screen (pygame.surface.Surface): pantalla del usuario
+        2. cols (int): cantidad de columnas
+        3. rows (int): cantidad de filas
+        4. image_banner (str): ruta de la imagen del banner
+        5. image_light_square (str): ruta de la imagen de la celda clara
+        6. image_dark_square (str): ruta de la imagen de la celda oscura
+    Returns:
+        1. scaled_banner (pygame.surface.Surface): superficie del marco
+        2. scaled_light_square (pygame.surface.Surface): superficie de la celda clara
+        3. scaled_dark_square (pygame.surface.Surface): superficie de la celdas oscuras  
+    """
     width, height = screen.get_size()    # ancho y alto actuales
-    cell_width  = width  // cols
+    cell_width  = width  // cols    # dimensiones de cada celda
     cell_height = height // rows
-
+    # Se transforman las imagenes a superficies dimensionadas de pygame
     banner = pygame.image.load(image_banner)
     scaled_banner = pygame.transform.scale(banner, (cell_width, cell_height))
 
@@ -54,7 +75,37 @@ def background_squares(screen, cols, rows, image_banner, image_light_square, ima
     return scaled_banner, scaled_light_square, scaled_dark_square
 
 # Funcion para el poscionamiento de los objetos (funcion universal)
-def cell_center(cols, rows, key, pos=None):
+def cell_center(cols: int, rows: int, key: str, pos=None):
+    """
+    Funcion universal para el correcto poscionamiento de los objetos en las celdas. La funcion toma
+    las columnas y filas de la pantalla. Ademas toma una key dependiendo de que se este posicionando.
+    Escencialmente la funcion busca centrar los elementos en su celda correspondiente. 
+    La siguiente es una lista de las keys y su uso de la variable pos
+        1. plant - pos es una tupla con las coordenadas de la celda donde se quiere posicionar una planta
+        2. sun - None
+        3. lawnmower - pos es la fila a la cual pertence la podadora
+        4. zombi - None
+        5. shovel_icon - None
+        6. sunflower_icon - None
+        7. peashooter_icon - None
+        8. nut_icon - None
+        9. boomerang_icon - None
+        10. cherry_icon - None
+        11. papapum_icon - None
+        12. suncounter_icon - None
+        13. cherry_range - tupla con las coordenadas del centro de una celda en la que fue posicionada 
+                            una planta cereza
+        14. boomerang_range - coordenada correspondiente al eje y al que pertence el proyectil
+        15. belt_icon - None
+        16. belt_nut_icon - None
+    Entradas:
+        1. cols (int): cantidad de columnas
+        2. rows (int): cantidad de filas
+        3. key (str): key segun que se esta posicionando
+        4. pos (None): posicion que varia su formato (tupla, int, etc) segun que se esta posicionando (key).
+    Returns:
+        Varia segun key, suele referirse a coordenadas centradas aunque puede variar
+    """
     # ← llamamos cada vez
     cell_width, cell_height = cell_size()
     if key == 'plant': #Falta terminar
