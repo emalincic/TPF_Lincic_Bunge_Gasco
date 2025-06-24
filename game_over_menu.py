@@ -21,9 +21,10 @@ def show_game_over(screen):
     pygame.mixer.music.load(os.path.join('Audio', "The Zombies Ate Your Brains! - Player's House - Plants vs. Zombies 2.mp3"))
     pygame.mixer.music.play(0)
     waiting = True
+    clock = pygame.time.Clock()
     while waiting:
         for ev in pygame.event.get():
             if ev.type in (pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
                 waiting = False
-        pygame.time.Clock().tick(60)
+        clock.tick(60)
     return True          

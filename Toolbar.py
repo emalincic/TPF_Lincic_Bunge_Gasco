@@ -54,7 +54,7 @@ class SelectableItem(pygame.sprite.Sprite):
 class Delivery(pygame.sprite.Sprite):
     def __init__(self, image, key, size):
         super().__init__()
-        self.speed = 0.5
+        self.speed = 0.3
         self.image = _load_scaled(image, size)
         self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
         self.key = key

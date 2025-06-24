@@ -1,5 +1,4 @@
 import pygame
-from random import randint
 import utils as UT
 
 # Clase soles

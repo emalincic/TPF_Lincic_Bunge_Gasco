@@ -1,211 +1,141 @@
-import os
 import pygame
-import random
 import sys
-import SUNS as SN
-import Plants as PL
-import zombies as ZB
-import zombies as ZB
-import main_menu as MM
-import Toolbar as TL
-import Gameloop as GL
-import utils as UT
-import game_over_menu as GOM
-from utils import GAME_OVER
-import json
+import os
+import Clasic_mode
+from Papapapapum import papapum
+# ───────────────────────── helpers ──────────────────────────
 
-# Ejecutamos menú principal antes del juego
-start_time = MM.time_counter() 
+def _hover_color(col: tuple[int, int, int]) -> tuple[int, int, int]:
+    """Genera un color de hover perceptible. 
+    Si el color es muy brillante (ej.: amarillo puro), lo oscurece; 
+    si es medio/oscuro, lo aclara."""
+    r, g, b = col
+    bright = r + g + b > 600
+    delta  = 70  # intensidad de cambio
+    if bright:
+        g = max(g - delta, 0)
+        b = max(b - delta, 0)
+    else:
+        r = min(r + delta, 255)
+        g = min(g + delta, 255)
+        b = min(b + delta, 255)
+    return (r, g, b)
 
-def main():
-    # TODO Intizialize pygame
+
+def draw_button(surf: pygame.Surface, rect: pygame.Rect, bg_color: tuple[int, int, int],
+                text_surf: pygame.Surface, *, border: int = 3, radius: int = 12,
+                hover: bool = False):
+    """Botón redondeado con contorno, sombra y color de hover."""
+    if hover:
+        bg_color = _hover_color(bg_color)
+
+    # sombra discreta
+    shadow = rect.copy().move(4, 4)
+    pygame.draw.rect(surf, (0, 0, 0, 90), shadow, border_radius=radius)
+
+    # cuerpo + contorno
+    pygame.draw.rect(surf, bg_color, rect, border_radius=radius)
+    pygame.draw.rect(surf, (0, 0, 0), rect, border, border_radius=radius)
+
+    # texto centrado
+    surf.blit(text_surf, text_surf.get_rect(center=rect.center))
+    
+
+def time_counter():
+    start_time = pygame.time.get_ticks()
+    return start_time
+
+
+# ───────────────────────── main menu ─────────────────────────
+
+def main_menu():
     pygame.init()
-    #* Grupos de las Plantas
-    sunflowers = pygame.sprite.Group()
-    pea_shooters_group = pygame.sprite.Group()
-    nuts_group = pygame.sprite.Group()
-    peas_group = pygame.sprite.Group()
-    cherry_group = pygame.sprite.Group()
-    papapum_group = pygame.sprite.Group()
-    boomerangs_group = pygame.sprite.Group()
-    boomerangs_bullet_group = pygame.sprite.Group()
+    default_dims = (1200, 600)
+    screen = pygame.display.set_mode(default_dims)
+    pygame.display.set_caption("TPF PvZ")
 
-    #* Grupo de los soles
-    soles_group = pygame.sprite.Group()
-    #* Grupon de los Zombies
-    zombies = pygame.sprite.Group()
+    # fuentes (título más grande y grueso)
+    title_font = pygame.font.Font("04B_03__.TTF", 90)
+    btn_font   = pygame.font.Font("04B_03__.TTF", 30)
 
-    lawnmowers = PL.add_lawnmowers(10, 6)
-    toolbar_group, toolbar_group_ghost = TL.toolbar()
+    # sonidos
+    pygame.mixer.music.load(os.path.join("Audio", "Main Menu - Plants vs. Zombies 2.mp3"))
+    pygame.mixer.music.set_volume(1.0)
+    pygame.mixer.music.play(-1)
 
+    fullscreen = False
 
-    def get_all_plants() -> list:
-        """
-        Funcion dinamica que retorna los spirtes de todas 
-        las plantas en forma de lista para su proximo uso.
-        Returns:
-            1. Lista con sprites de las plantas
-        """
-        return sunflowers.sprites() + pea_shooters_group.sprites() + nuts_group.sprites() + cherry_group.sprites() + papapum_group.sprites() + boomerangs_group.sprites()
-    
-    # Creamos ventana
-    screen = pygame.display.get_surface()  # ← no crea otra
-    pygame.display.set_caption('Plants vs Zombies')
+    # textos precalculados
+    txt_play     = btn_font.render("Jugar",    True, (0, 0, 0))
+    txt_papapum  = btn_font.render("Papapapapum",  True, (0, 0, 0))
+    txt_full     = btn_font.render("Pantalla Completa", True, (0, 0, 0))
+    txt_window   = btn_font.render("Modo Ventana",      True, (0, 0, 0))
 
-    # Partes del fonde
-    marco, claro, oscuro = UT.background_squares(
-        screen, 10, 6, 'Images/marco_marron.png', 
-        'Images/celda_verde_claro.png', 
-        'Images/celda_verde_oscuro.png')
-    
-    # Evento personalizado para los soles
-    SUN_EVENT = pygame.USEREVENT + 1
-    pygame.time.set_timer(SUN_EVENT, 10000)
+    # tamaños de botones
+    btn_play_size    = (200, 60)
+    btn_papapum_size = (350, 60)
+    btn_toggle_size  = (300, 50)
+    margin           = 20
 
-    # Eventos de los zombies
-    ADDZOMBIE = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDZOMBIE, random.choice([5000, 8000, 9000]))
-    with open("DataBase.json") as file:
-        database = json.load(file)
-    
+    clock = pygame.time.Clock()
 
-    # Obtenemos los estilos del mouse
-    mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
-    pygame.mouse.set_cursor(mouse_opened)
+    while True:
+        width, height = screen.get_size()
+        center_y = int(height * 0.65)
 
+        btn_play_rect = pygame.Rect(0, 0, *btn_play_size)
+        btn_play_rect.center = (int(width * 0.25), center_y)
 
-    
-    sun_counter = 50
-    font = pygame.font.Font("04B_03__.TTF", 35) 
-    
+        btn_papapum_rect = pygame.Rect(0, 0, *btn_papapum_size)
+        btn_papapum_rect.center = (int(width * 0.75), center_y)
 
-    frames = pygame.time.Clock()
+        btn_toggle_rect = pygame.Rect(
+            width - btn_toggle_size[0] - margin,
+            margin,
+            *btn_toggle_size,
+        )
 
-    # Llamada de los zombis incial 
-    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
-    pygame.mixer.music.play(0)
-
-    
-
-    is_flag = False
-    run = True
-    selected_object = None
-    dragging = None
-    while run:
-        current_time = pygame.time.get_ticks()
-        events = pygame.event.get()
-        
-        for event in events:
-            # Mouse abierto o mouse cerrado
-            if pygame.mouse.get_pressed()[0]: pygame.mouse.set_cursor(mouse_pressed)
-            else: pygame.mouse.set_cursor(mouse_opened)
-
-            # Si cierra la venta se cierra el juego   
+        # ───── event loop ─────
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
-            
-            # Si pierde se abre la pantalla de 'game over'
-            elif event.type == GAME_OVER:               
-                GOM.show_game_over(screen)   
-                run = False 
-                break
-
-            # Se agrega sol si se cumple el evento
-            elif event.type == SUN_EVENT:
-                new_sun = SN.Suns('Images/sol.png')
-                soles_group.add(new_sun)
-            
-            # Se agrega zombi si se cumple el evento
-            elif event.type == ADDZOMBIE:
-                # Oleada de zombies continuea
-                # CHE EMA
-                if (current_time - start_time) // 1000 >= 150 and not is_flag:
-                        flag = ZB.Zombies(database['flag'], 'flag') # zombi bandera (marca oleada)
-                        zombies.add(flag)                       
-                        pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
-                        pygame.mixer.music.play(0)
-                        pygame.time.set_timer(ADDZOMBIE, random.choice([2500, 3000, 3500]))
-                        is_flag = True 
-
-                # Se agrega zombi random
-                random_z = random.choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
-                if random_z == 'balloon':
-                    its_time_for_zombies = ZB.balloon(database[random_z], random_z)
-                else:
-                    its_time_for_zombies = ZB.Zombies(database[random_z], random_z)
-                zombies.add(its_time_for_zombies)
-            
-            # Eventos del mouse
+                pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                for item, item_ghost in zip(toolbar_group, toolbar_group_ghost):
-                    if item.rect.collidepoint(event.pos):
-                        real_card = next(card for card in toolbar_group if card.key == item_ghost.key)
-                        # Si no se acabo el cooldown se puede seleccionar
-                        if real_card.ready():           
-                            selected_object = item.key
-                            dragging = item_ghost
-                            original_pos = dragging.rect.center
-                        else:               
-                            pass
+                if btn_play_rect.collidepoint(event.pos):
+                    Clasic_mode.main()
+                elif btn_papapum_rect.collidepoint(event.pos):
+                    papapum()
+                elif btn_toggle_rect.collidepoint(event.pos):
+                    fullscreen = not fullscreen
+                    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) if fullscreen else pygame.display.set_mode(default_dims)
 
-                # Si se clickea sol se recoge y se agrega al contador 50 soles     
-                for sol in soles_group:
-                    if sol.rect.collidepoint(event.pos):
-                        sun_counter += sol.grab()
+        # ───── drawing ─────
+        fondo = pygame.image.load(os.path.join('Images', 'pvz_udesa.png')).convert()
+        fondo = pygame.transform.scale(fondo, (width, height))
+        screen.blit(fondo, (0, 0))
 
-            elif event.type == pygame.MOUSEBUTTONUP and dragging:
-                # Tomamos posicion del mouse y placement si se busca ubicar una planta
-                pos = pygame.mouse.get_pos()
-                placement = UT.cell_center(10, 6, 'plant', pos)
+        # título con sombra destacada
+        title_white  = title_font.render("Plants vs Zombies", True, (255, 255, 255))
+        title_shadow = title_font.render("Plants vs Zombies", True, (0, 0, 0))
+        title_pos = title_white.get_rect(midtop=(width // 2, 80))
+        screen.blit(title_shadow, title_pos.move(4, 4))
+        screen.blit(title_white,  title_pos)
 
-                # Se chequea si la pala recoge una planta
-                if selected_object == 'shovel_icon' : 
-                    sun_counter += GL.shovel_action(get_all_plants(), pos)
+        mouse_pos = pygame.mouse.get_pos()
 
-                # Se chequea que no haya plantas donde se quiere ubicar la planta
-                elif placement is not None and not any(p.rect.center == placement for p in get_all_plants()):
-                    cost = GL.plant_placement(
-                        selected_object, sun_counter, placement,
-                        pea_shooters_group, sunflowers, nuts_group, cherry_group, papapum_group, boomerangs_group)
-                    # Se deducen los costos de ubicar la planta al contador                                       
-                    if cost:                                
-                        sun_counter -= cost                
-                        for card in toolbar_group:          
-                            if card.key == selected_object: 
-                                card.start_cooldown()       
-                                break                       
+        draw_button(screen, btn_play_rect, (100, 255, 0), txt_play,
+                    hover=btn_play_rect.collidepoint(mouse_pos))
 
-                dragging.rect.center = original_pos
-                dragging = None            
-                selected_object = None
-            elif event.type == pygame.MOUSEMOTION and dragging:
-                dragging.rect.center = (event.pos)
+        draw_button(screen, btn_papapum_rect, (180, 255, 0), txt_papapum,
+                    hover=btn_papapum_rect.collidepoint(mouse_pos))
+
+        draw_button(screen, btn_toggle_rect, (150, 255, 0),
+                    txt_full if not fullscreen else txt_window,
+                    hover=btn_toggle_rect.collidepoint(mouse_pos), radius=8)
+
+        pygame.display.flip()
+        clock.tick(60)
 
 
-        # ACTUALIZACIÓN DE OBJETOS
-        # Dibujar grilla 10x6 dinámica
-        GL.update_grid(10, 6, screen, marco, oscuro, claro)
-        # Actualizamos la posicion de los guisantes
-        GL.update_peas(peas_group, boomerangs_bullet_group, screen)
-        # Actualizamos acciones de las plantas
-        GL.update_plants(get_all_plants(), zombies, peas_group, soles_group, boomerangs_bullet_group, screen)
-        # Actualizamos acciones de los zombies
-        GL.udpate_zombies(zombies, get_all_plants(), peas_group, boomerangs_bullet_group, screen)
-        # Actualizamos los soles
-        GL.update_suns(soles_group, screen)
-        # Actaulizamos las cosechadoras
-        GL.update_lawnmowers(lawnmowers, zombies, screen)
-        
-        toolbar_group.update()  
-        toolbar_group_ghost.draw(screen)
-        toolbar_group.draw(screen)
-        # Convertir el contador a imagen de texto
-        counter = font.render(str(sun_counter), True, (255, 255, 255))  # Blanco
-        # Mostrarlo en pantalla, por ejemplo en la esquina superior izquierda
-        counter_sprite = list(toolbar_group)[-1]
-        counter_center = counter.get_rect(center=counter_sprite.rect.center)
-        screen.blit(counter, (counter_center[0]+35, counter_center[1]+5))
-        frames.tick(60) # Limitar a 60 FPS
-        pygame.display.update()
-    pygame.quit() 
-    sys.exit()
+if __name__ == "__main__":
+    main_menu()

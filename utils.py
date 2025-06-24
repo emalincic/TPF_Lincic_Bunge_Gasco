@@ -5,7 +5,7 @@ from random import randint
 
 # COLS, ROWS = 10, 6
 #! ESTO PORQUE ESTA ACA?
-GAME_OVER = pygame.USEREVENT + 3
+GAME_OVER = pygame.USEREVENT + 4
 SEED_COOLDOWN = 5_000  
 def cell_size(COLS=10, ROWS=6) -> tuple:
     """
