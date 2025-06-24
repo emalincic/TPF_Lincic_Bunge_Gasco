@@ -38,16 +38,6 @@ class Zombies(pygame.sprite.Sprite):
             
     def selfdamage(self, dmg: int = 20):
         self.health -= dmg
-        if self.health < self.max_health * 0.4:
-            try:
-                self.image = os.path.join("Images", self.zombie_type["image"][1])
-            except IndexError:
-                self.image = os.path.join("Images", self.zombie_type["image"][0])
-            raw = pygame.image.load(self.image).convert_alpha()
-            c_w, c_h = UT.cell_size()
-            self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))
-            self.rect = self.surf.get_rect(center=(self.rect.centerx, self.rect.centery))
-            self.speed = max(0.5, UT.cell_size()[0] / 240)
         if self.health <= 0:
             self.kill()
     
@@ -56,6 +46,7 @@ class Zombies(pygame.sprite.Sprite):
             self.Channel.play(self.eating_sound, loops=-1)
         else:
             self.Channel.stop()
+
     def ready_to_hit(self):
         if not hasattr(self, "_ready_time"):
             self._ready_time = pygame.time.get_ticks()
@@ -71,8 +62,9 @@ class balloon(Zombies):
         super().__init__(zombie_type, random_z)
     def balloon_ability(self):
         if self.health < self.max_health * 0.4:
+            self.speed = 0.35
             self.type = 'Normal'
-            self.image = 'Images\Balloonzombie2.png'
+            self.image = os.path.join("Images","Balloonzombie2.png")
             raw = pygame.image.load(self.image).convert_alpha()
             c_w, c_h = UT.cell_size()
             self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))

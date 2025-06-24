@@ -54,7 +54,7 @@ class SelectableItem(pygame.sprite.Sprite):
 class Delivery(pygame.sprite.Sprite):
     def __init__(self, image, key, size):
         super().__init__()
-        self.speed = 0.3
+        self.speed = 0.5
         self.image = _load_scaled(image, size)
         self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
         self.key = key
@@ -78,7 +78,6 @@ def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
 def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
     cell_w, cell_h = UT.cell_size()
 
-    
     seed_size = (int(cell_h * 1.10), int(cell_h))       # paquetes
     icon_size = (int(cell_h * 0.70), int(cell_h * 0.80))  # iconos "fantasma"
     counter_size = (int(cell_h * 2.25), int(cell_h * 1.50))
@@ -111,14 +110,14 @@ def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
 def special_delivery():
     
     cell_w, cell_h = UT.cell_size()
-    seed_size = (int(cell_h * 1.10), int(cell_h))
-    belt_size = (int(cell_h * 10), int(cell_h))
+    seed_size = (cell_h * 1.10, cell_h)
+    belt_size = (cell_h * 20, cell_h - 5)
     
     belt_group = pygame.sprite.Group()
     belt_group.add(Delivery('belt.png', 'belt_icon', belt_size))
     
     nuts_toolbar_group = pygame.sprite.Group()
-    nuts_toolbar_group.add(Delivery('NT_seedpacket.png', 'belt_nut_icon', (seed_size[0]-15, seed_size[1]-15)))
+    nuts_toolbar_group.add(Delivery('NT_seedpacket.png', 'belt_nut_icon', (seed_size[0]-20, seed_size[1]-20)))
     
     nuts_group_ghost = pygame.sprite.Group()
     nuts_group_ghost.add(Delivery_Ghost('Nut.png', 'belt_icon', (seed_size[0]-15, seed_size[1]-15)))

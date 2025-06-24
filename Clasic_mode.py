@@ -1,6 +1,6 @@
 import os
 import pygame
-import random
+from random import choice, choices
 import sys
 import SUNS as SN
 import Plants as PL
@@ -39,7 +39,6 @@ def main():
     lawnmowers = PL.add_lawnmowers(10, 6)
     toolbar_group, toolbar_group_ghost = TL.toolbar()
 
-
     def get_all_plants() -> list:
         """
         Funcion dinamica que retorna los spirtes de todas 
@@ -65,10 +64,21 @@ def main():
 
     # Eventos de los zombies
     ADDZOMBIE = pygame.USEREVENT + 2
-    pygame.time.set_timer(ADDZOMBIE, random.choice([7000, 8000, 9000]))
+    pygame.time.set_timer(ADDZOMBIE, choice([7000, 8000, 9000]))
     with open("DataBase.json") as file:
         database = json.load(file)
-    
+
+    def iniciar_oleada(database, time):
+        flag = ZB.Zombies(database['flag'], 'flag')
+        zombies.add(flag)
+        pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
+        pygame.mixer.music.play(0)
+        for k, v in database.items():
+            if k != 'Normal' and k != 'flag':
+                if k == "balloon":
+                    v['probability'] += 0.3
+                v['probability'] += 0.15
+        pygame.time.set_timer(ADDZOMBIE, time)
 
     # Obtenemos los estilos del mouse
     mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
@@ -78,9 +88,9 @@ def main():
     pygame.mixer.music.play(0)
 
     font = pygame.font.Font("04B_03__.TTF", 35) 
-    sun_counter = 50
+    sun_counter = 50000
 
-    is_flag = False
+    wave_level = 1
     run = True
     selected_object = None
     dragging = None
@@ -112,21 +122,16 @@ def main():
             
             # Se agrega zombie si se cumple el evento
             elif event.type == ADDZOMBIE:
-                if temp >= 150 and temp < 300 and not is_flag:
-                    flag = ZB.Zombies(database['flag'], 'flag')
-                    zombies.add(flag)
-                    pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
-                    pygame.mixer.music.play(0)
-                    pygame.time.set_timer(ADDZOMBIE, random.choice([2500, 3000, 3500]))
-                    is_flag = True
+                if 150 <= temp < 300 and wave_level == 1:
+                    iniciar_oleada(database, choice([2500, 3000, 3500]))
+                    wave_level = 2
 
-                elif temp >= 300 and is_flag:
-                    # Nueva oleada
-                    pygame.time.set_timer(ADDZOMBIE, random.choice([1000, 1500]))
-                    is_flag = False
+                elif temp >= 300 and wave_level == 2:
+                    iniciar_oleada(database, choice([1000, 1500]))
+                    wave_level = 3
 
                 # Se agrega zombi random
-                random_z = random.choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
+                random_z = choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
                 if random_z == 'balloon':
                     its_time_for_zombies = ZB.balloon(database[random_z], random_z)
                 else:
@@ -172,7 +177,7 @@ def main():
                             if card.key == selected_object: 
                                 card.start_cooldown()       
                                 break                       
-
+                # Reset del dragging
                 dragging.rect.center = original_pos
                 dragging = None            
                 selected_object = None

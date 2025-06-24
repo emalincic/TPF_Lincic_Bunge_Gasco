@@ -21,7 +21,7 @@
         "health": 900,
         "speed": 0.5,
         "image": ["Balloonzombie.png", "Balloonzombie2.png"],
-        "probability": 0.1
+        "probability": 1
     },
     "flag" : {
         "health": 190,
