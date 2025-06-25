@@ -2,6 +2,8 @@ import os
 import pygame
 import Plants as PL
 
+#  ───────────────────────── Actions  ─────────────────────────
+
 # ACCION DE LA PALA
 def shovel_action(plants: list, pos: tuple) -> int:
     """
@@ -72,7 +74,7 @@ def plant_placement(selected_object: str, sun_counter: int, placement: tuple, pe
 
 
 
-# ACCIONES DE LAS ENTIDADES
+# ───────────────────────── Updates for Clasic Mode ─────────────────────────
 def update_peas(peas_group: pygame.sprite.Group, boomerangs_bullet_group: pygame.sprite.Group, 
                 screen: pygame.surface.Surface):
     """
@@ -208,9 +210,9 @@ def update_grid(cols: int, rows: int, screen: pygame.surface.Surface,
             else:
                 screen.blit(dark_square, (i*cell_width, j*cell_height))
 
-# ============================
-# UPDATES FOR PAPAPAPAPUM MODE
-# ============================
+
+# ───────────────────────── Updates for Papapapum Mode  ─────────────────────────
+
 def update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, screen, dragging):
     sorted_nuts = sorted(nuts_toolbar_group, key=lambda nut: nut.rect.x) 
     sorted_nuts_ghost = sorted(nuts_group_ghost, key=lambda nut: nut.rect.x)
@@ -239,7 +241,7 @@ def update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, scree
     for nut_placed in nuts_group:
         screen.blit(nut_placed.image, nut_placed.rect)
 
-def update_zombies_papum(nuts_group, zombies, screen):
+def update_zombies_papum(nuts_group: pygame, zombies, screen):
     for nut in nuts_group:
         nut.ability()
 
@@ -254,11 +256,17 @@ def update_zombies_papum(nuts_group, zombies, screen):
                 nut.already_hit = True
             nut.already_hit = False
 
-def nut_placement(placement, nuts_group, nuts_toolbar_group):
+def nut_placement(placement: tuple, nuts_group: pygame.sprite.Group, nuts_toolbar_group: pygame.sprite.Group):
+    """
+    Funcion designada a ubicar las Nueces del modo papapapum. Si placement es None (Nuez ubicada en lugar no permitido),
+    no se logra posicionar. En caso de ser una tupla con coordenads se agrega al pygame group de las Nueces una nueva
+    y se elimina de la cinta.
+    """
     if placement:
-        nut_placed = PL.Spinning_Nut('Images/Nut.png', placement)
+        nut_placed = PL.Spinning_Nut(os.path.join('Images', 'Nut.png'), placement)
         nuts_group.add(nut_placed)
 
+    # Se elimina Nueces puestas
     for nuts in nuts_toolbar_group:
         if placement:
             nuts.kill()

@@ -11,10 +11,17 @@ import game_over_menu as GOM
 from utils import GAME_OVER
 import json
 
+
 # TODO Intizialize pygame
 def papapum():
+    
     pygame.init()
+    # Temporizador del menú principal
+    start_time = Main.time_counter()
+
+    # Frames del juego
     frames = pygame.time.Clock()
+
     # Creamos ventana
     screen = pygame.display.get_surface()  # ← no crea otra
     pygame.display.set_caption('Plants vs Zombies')
@@ -35,37 +42,59 @@ def papapum():
     # Evento personalizado para la aparición de zombies
     ADDZOMBIE = pygame.USEREVENT + 2
     pygame.time.set_timer(ADDZOMBIE, choice([4000, 5000]))
+
     # Utilización de la base de datos de los zombies
     with open("DataBase.json") as file:
         database = json.load(file)
+    
+    # Gestión de oleadas
+    def iniciar_oleada(level: int, database: dict):
+        """
+        Función que maneja las oleadas adecatendo el tiempo de aparición de los zombies
+        Entradas:
+            1. level (int): nivel de la oleada
+            2. database (dict): Diccionario de la base de datos.
+        Returns: -
+        """
+        flag = ZB.Zombies(database['flag'], 'flag')
+        zombies.add(flag)
+        pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
+        pygame.mixer.music.play(0)
+        for k, v in database.items():
+            if k != 'Normal' and k != 'flag':
+                if k == "balloon":
+                    v['probability'] += 0.3
+                v['probability'] += 0.15
+        if level == 1:
+            pygame.time.set_timer(ADDZOMBIE,choice([2500, 3000, 3500]))
+        elif level == 2:
+            pygame.time.set_timer(ADDZOMBIE, choice([1000, 1500]))
 
     # Evento personalizado para la aparición de nueces (seed packets)
     ADDNUT = pygame.USEREVENT + 3
     pygame.time.set_timer(ADDNUT, choice([7000, 8000, 10000]))
 
-
     # Obtenemos los estilos del mouse
-    mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
+    mouse_opened, mouse_pressed = UT.mouses(
+        os.path.join('Images', 'Mouse.png'), 
+        os.path.join('Images', 'Mouse_click.png'))
     pygame.mouse.set_cursor(mouse_opened)
 
-    
     # Cálculos de tamaños para utilizarse luego
-    cell_w, cell_h = UT.cell_size()
+    _, cell_h = UT.cell_size()
     seed_size = (int(cell_h * 1.10), int(cell_h))
 
     # Zombies are coming efecto de sonido
     pygame.mixer.music.load(os.path.join("Audio", "The Zombies Are coming Sound Effect.mp3"))
     pygame.mixer.music.play(0) # Se reproduce una vez
-    
 
-    
-    is_flag = False # Confirmación si la oleada ya sucedió
-    run = True # Verificación de que el juego corra
     dragging = None # Elemeto de la toolbar draggeado
-
+    run = True # Verificación de que el juego corra
     while run:
         events = pygame.event.get()
         current_time = pygame.time.get_ticks()
+        temp = (current_time - start_time) // 1000
+        
 
         for event in events:
             # Mouse abierto o mouse cerrado
@@ -85,15 +114,15 @@ def papapum():
             
             # Se agrega un zombie si se cumple el evento
             elif event.type == ADDZOMBIE:
-                # Cronómetro para la oleada
-                if (current_time) // 1000 >= 150 and not is_flag:
-                        flag = ZB.Zombies(database['flag'], 'flag')
-                        zombies.add(flag)
-                        pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
-                        pygame.mixer.music.play(0)
-                        pygame.time.set_timer(ADDZOMBIE, choice([1500, 2000, 2500])) # Más zombies aparecen
-                        pygame.time.set_timer(ADDNUT, choice([4000, 5000, 6000])) # Más nueces aparecen (menos proporción)
-                        is_flag = True 
+                # Segunda oleada
+                if 150 <= temp < 300 and wave_level == 1:
+                    iniciar_oleada(wave_level, database)
+                    wave_level = 2
+
+                # Tercera oleada
+                elif temp >= 300 and wave_level == 2:
+                    iniciar_oleada(wave_level, database)
+                    wave_level = 3
 
                 # Zombie aleatorio según su probabilidad
                 random_z = choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
@@ -139,10 +168,10 @@ def papapum():
         # Actualizamos acciones de las plantas
         belt_group.draw(screen)
         GL.update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, screen, dragging)
-        was_placed = False
         # Actualizamos acciones de los zombies
         GL.update_zombies_papum(nuts_group, zombies, screen)
         
+
         frames.tick(60)
         pygame.display.update()
 

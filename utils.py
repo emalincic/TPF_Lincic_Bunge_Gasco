@@ -2,14 +2,18 @@ import pygame
 from random import randint
 
 
-
+#! TEMA COOLDOWNS
 # COLS, ROWS = 10, 6
 #! ESTO PORQUE ESTA ACA?
 GAME_OVER = pygame.USEREVENT + 4
 SEED_COOLDOWN = 5_000  
+
 def cell_size(COLS=10, ROWS=6) -> tuple:
     """
     Funcion utilizada para calcular el tamaño de las celdas. 
+    Entradas:
+        1. COLS (int): numero de columnas
+        2. ROWS (int): numero de filas
     """
     surface = pygame.display.get_surface()
     if surface is None:        
@@ -95,7 +99,7 @@ def cell_center(cols: int, rows: int, key: str, pos=None):
         12. suncounter_icon - None
         13. cherry_range - tupla con las coordenadas del centro de una celda en la que fue posicionada 
                             una planta cereza
-        14. boomerang_range - coordenada correspondiente al eje y al que pertence el proyectil
+        14. boomerang_range - coordenada correspondiente al eje 'y' al que pertence el proyectil
         15. belt_icon - None
         16. belt_nut_icon - None
     Entradas:
@@ -108,7 +112,7 @@ def cell_center(cols: int, rows: int, key: str, pos=None):
     """
     # ← llamamos cada vez
     cell_width, cell_height = cell_size()
-    if key == 'plant': #Falta terminar
+    if key == 'plant': 
         col = pos[0] // cell_width
         row = pos[1] // cell_height
         if col == 0 or row == 0:
@@ -189,8 +193,8 @@ def cell_center(cols: int, rows: int, key: str, pos=None):
         return pygame.Rect(left, top, width, height)  
     elif key == 'boomerang_range':
         col = 9
-        row = pos // cell_width
-        return (col * cell_width + cell_width // 2, row)
+        row = pos // cell_height
+        return (col * cell_width + cell_width // 2, row *cell_height + cell_height//2)
     elif key == 'belt_icon':
         row = 0
         col = 1

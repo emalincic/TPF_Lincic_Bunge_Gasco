@@ -3,6 +3,8 @@ import sys
 import os
 import Clasic_mode
 from Papapapapum import papapum
+import utils as UT
+
 # ───────────────────────── helpers ──────────────────────────
 
 def _hover_color(col: tuple[int, int, int]) -> tuple[int, int, int]:
@@ -54,6 +56,11 @@ def main_menu():
     screen = pygame.display.set_mode(default_dims)
     pygame.display.set_caption("TPF PvZ")
 
+    # Obtenemos los estilos del mouse
+    mouse_opened, mouse_pressed = UT.mouses(os.path.join('Images', 'Mouse.png'), 
+                                            os.path.join('Images', 'Mouse_click.png'))
+    pygame.mouse.set_cursor(mouse_opened)
+
     # fuentes (título más grande y grueso)
     title_font = pygame.font.Font("04B_03__.TTF", 90)
     btn_font   = pygame.font.Font("04B_03__.TTF", 30)
@@ -97,12 +104,16 @@ def main_menu():
 
         # ───── event loop ─────
         for event in pygame.event.get():
+            # Mouse abierto o mouse cerrado
+            if pygame.mouse.get_pressed()[0]: pygame.mouse.set_cursor(mouse_pressed)
+            else: pygame.mouse.set_cursor(mouse_opened)
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if btn_play_rect.collidepoint(event.pos):
-                    Clasic_mode.main()
+                    Clasic_mode.Clasic()
                 elif btn_papapum_rect.collidepoint(event.pos):
                     papapum()
                 elif btn_toggle_rect.collidepoint(event.pos):

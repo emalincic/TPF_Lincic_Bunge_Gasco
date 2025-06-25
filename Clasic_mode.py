@@ -2,11 +2,10 @@ import os
 import pygame
 from random import choice, choices
 import sys
-import SUNS as SN
 import Plants as PL
 import zombies as ZB
 import zombies as ZB
-import Main as MM
+import Main
 import Toolbar as TL
 import Gameloop as GL
 import utils as UT
@@ -14,12 +13,14 @@ import game_over_menu as GOM
 from utils import GAME_OVER
 import json
 
-# Ejecutamos menú principal antes del juego
-start_time = MM.time_counter() 
 
-def main():
+
+def Clasic():
+    
     # TODO Intizialize pygame
     pygame.init()
+    # Temporizador del menú princpal
+    start_time = Main.time_counter()
     frames = pygame.time.Clock()
     #* Grupos de las Plantas
     sunflowers = pygame.sprite.Group()
@@ -41,8 +42,7 @@ def main():
 
     def get_all_plants() -> list:
         """
-        Funcion dinamica que retorna los spirtes de todas 
-        las plantas en forma de lista para su proximo uso.
+        Funcion dinamica que retorna los spirtes de todas las plantas en forma de lista para su proximo uso.
         Returns:
             1. Lista con sprites de las plantas
         """
@@ -52,7 +52,7 @@ def main():
     screen = pygame.display.get_surface()  # ← no crea otra
     pygame.display.set_caption('Plants vs Zombies')
 
-    # Partes del fonde
+    # Partes del fondo
     marco, claro, oscuro = UT.background_squares(
         screen, 10, 6, 'Images/marco_marron.png', 
         'Images/celda_verde_claro.png', 
@@ -68,7 +68,15 @@ def main():
     with open("DataBase.json") as file:
         database = json.load(file)
 
-    def iniciar_oleada(database, time):
+    # Gestión de oleadas
+    def iniciar_oleada(level: int, database: dict):
+        """
+        Función que maneja las oleadas adecatendo el tiempo de aparición de los zombies
+        Entradas:
+            1. level (int): nivel de la oleada
+            2. database (dict): Diccionario de la base de datos.
+        Returns: -
+        """
         flag = ZB.Zombies(database['flag'], 'flag')
         zombies.add(flag)
         pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
@@ -78,23 +86,33 @@ def main():
                 if k == "balloon":
                     v['probability'] += 0.3
                 v['probability'] += 0.15
-        pygame.time.set_timer(ADDZOMBIE, time)
+        if level == 1:
+            pygame.time.set_timer(ADDZOMBIE,choice([2500, 3000, 3500]))
+        elif level == 2:
+            pygame.time.set_timer(ADDZOMBIE, choice([1000, 1500]))
+            
 
     # Obtenemos los estilos del mouse
-    mouse_opened, mouse_pressed = UT.mouses('Images/Mouse.png', 'Images/Mouse_click.png')
+    mouse_opened, mouse_pressed = UT.mouses(
+        os.path.join('Images', 'Mouse.png'), 
+        os.path.join('Images', 'Mouse_click.png'))
     pygame.mouse.set_cursor(mouse_opened)
+
     # Llamada de los zombis incial 
     pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
     pygame.mixer.music.play(0)
 
+    # Características del contador
     font = pygame.font.Font("04B_03__.TTF", 35) 
-    sun_counter = 50000
+    sun_counter = 5000
 
+    # Gestión de atributos
     wave_level = 1
+    selected_object = None  #|-> Selección del objeto de la barra de plantas
+    dragging = None         #|
+
+    # Loop principal
     run = True
-    selected_object = None
-    dragging = None
-    
     while run:
         current_time = pygame.time.get_ticks()
         temp = (current_time - start_time) // 1000
@@ -113,21 +131,21 @@ def main():
             elif event.type == GAME_OVER:               
                 GOM.show_game_over(screen)   
                 run = False 
-                MM.main_menu()
+                Main.main_menu()
 
             # Se agrega sol si se cumple el evento
             elif event.type == SUN_EVENT:
-                new_sun = SN.Suns('Images/sol.png')
+                new_sun = PL.Suns('Images/sol.png')
                 soles_group.add(new_sun)
             
             # Se agrega zombie si se cumple el evento
             elif event.type == ADDZOMBIE:
                 if 150 <= temp < 300 and wave_level == 1:
-                    iniciar_oleada(database, choice([2500, 3000, 3500]))
+                    iniciar_oleada(wave_level, database)
                     wave_level = 2
 
                 elif temp >= 300 and wave_level == 2:
-                    iniciar_oleada(database, choice([1000, 1500]))
+                    iniciar_oleada(wave_level, database)
                     wave_level = 3
 
                 # Se agrega zombi random

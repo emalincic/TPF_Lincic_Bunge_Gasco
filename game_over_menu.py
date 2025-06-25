@@ -1,6 +1,17 @@
 import pygame
 import os
-def show_game_over(screen):
+def show_game_over(screen: pygame.Surface) -> bool:
+    """Muestra la pantalla de *Game Over* y espera a que el jugador interactue,
+       Reproduce la musica de *Game_Over*
+
+       Entradas:
+       screen (pygame.Surface):
+       
+       Returns:
+       bool: `True` cuando se detecta una acción del usuario y se abandona la
+        pantalla de *Game Over*. No retorna `False`; el valor puede usarse para
+        encadenar lógica (p. ej. reiniciar el juego) si se desea.
+        """
     font_big = pygame.font.Font("04B_03__.TTF", 120)
     font_small = pygame.font.Font("04B_03__.TTF", 40)
 

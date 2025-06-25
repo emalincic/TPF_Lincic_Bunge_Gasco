@@ -1,6 +1,5 @@
 import pygame
 import utils as UT
-import SUNS as SN
 import os
 pygame.mixer.init()
 
@@ -68,7 +67,7 @@ class Sunflower(Plants):
         if self.ready is None:
             self.ready = pygame.time.get_ticks()
         elif pygame.time.get_ticks() - self.ready >= 10000:
-            sun = SN.SF_sun('Images/sol.png', self.rect.center, self.rect.centery)
+            sun = SF_sun('Images/sol.png', self.rect.center, self.rect.centery)
             self.ready = None
             return sun, 'sunflower'
         return None, None
@@ -117,7 +116,7 @@ class Boomerang(Plants):
          2. String que identifica que la accion fue hecha por la planta boomerang ('boomerang')        
         """
         # Se verifica que haya zombis para disparar en su fila
-        if not any(z.cy == self.pos[1] for z in zombies): #! SE PUEDE MEJORAR (SOLO SI EL ZOMBI ESTA DELANTE DE LA PLANTA)
+        if not any(z.cy == self.pos[1] and z.rect.x >= self.pos[0] for z in zombies):
             return None, None
         if self.ready is None:       # Se empieza timer para disparar un proyectil
             self.ready = pygame.time.get_ticks() 
@@ -188,7 +187,7 @@ class PeaShotter(Plants):
         self.shooting_sound = pygame.mixer.Sound(os.path.join('Audio', 'zombies eating sound.mp3'))
         self.Channel = pygame.mixer.Channel(1)
         self.shooting = False
-    def ability(self, zombies: pygame.sprite.Group) -> tuple: #! USAMOS ESE TYPEHINT PARA LOS ZOMBIS?
+    def ability(self, zombies: pygame.sprite.Group) -> tuple:
         """
         Clase para la habilidad del Lanzaguisante. Dispara un proyectil que recorre la fila, hasta
         impactar con un zombi.
@@ -197,7 +196,7 @@ class PeaShotter(Plants):
          2. String que identifica que la accion fue hecha por el lanzaguisantes ('peashotter')        
         """
         # Se verifica que haya zombis para disparar en su fila
-        if not any(z.cy == self.pos[1] for z in zombies): 
+        if not any(z.cy == self.pos[1] and z.rect.x >= self.pos[0] for z in zombies): 
             return None, None
         if self.ready is None:
             self.ready = pygame.time.get_ticks()
@@ -221,7 +220,7 @@ class Pea(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(raw, (size, size)) # Se dimensiona la imagen
         self.x, self.y = pos
         self.rect = self.image.get_rect(center=(self.x, self.y - int(ch * 0.25))) # Se obtiene el rect del guisante
-        self.speed = max(4, cw // 20) #! LO MISMO ACA QUE ES ESTO
+        self.speed = max(4, cw // 20)
     def shoot(self):
         """
         Metodo que avanca la posicion del guisante
@@ -305,17 +304,18 @@ class Spinning_Nut(Plants):
     Nuez rueda y elimina a los zombis en su fila. Su habilidad se ejecuta en la funcion
     ability().
     """
-    def __init__(self, image_file: str, pos: tuple, cost=None, life=None, dims: tuple=(1200, 600)):
+    def __init__(self, image_file: str, pos: tuple, cost=None, life=None):
         super().__init__(image_file, pos, cost, life)
         self.speed = 0
+        self.angle = 0
+        
         cw, ch = UT.cell_size()
-        self.dims = dims
         raw = pygame.image.load(image_file).convert_alpha()     # Se transforma la imagen
         self.image = pygame.transform.scale(raw, (cw - 10, ch - 10))
         self.original_image = pygame.transform.scale(raw, (cw - 10, ch - 10))
         self.rect = self.image.get_rect(midright=pos)
         self.pos = pygame.Vector2(self.rect.center)  # posición flotante precisa
-        self.angle = 0
+        
         self.already_hit = False
 
     def ability(self):
@@ -331,10 +331,10 @@ class Spinning_Nut(Plants):
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect(center=self.pos)  # usar pos exacta como centro
 
-        if self.rect.left >= self.dims[0]:
+        screen_w = pygame.display.get_surface().get_width()
+        if self.rect.left >= screen_w:
             self.kill()
-
-
+            
 # ────────────────────────── Podadora ──────────────────────────
 class Lawnmower(pygame.sprite.Sprite):
     """
@@ -384,3 +384,63 @@ def add_lawnmowers(cols: int = 10, rows: int = 6) -> pygame.sprite.Group:
         if center:
             lawnmowers.add(Lawnmower(*center))
     return lawnmowers
+
+# ────────────────────────── Soles ────────────────────────── 
+class Suns(pygame.sprite.Sprite):
+    """
+    Clase para los soles de nuestro juego (hija de la clase sprite.Sprite de pygame).
+    """
+    def __init__(self, image_file: str, start_pos = None, fpy = None, value=50, cols = 10, rows = 6):
+        """
+        Se toman como entradas la ruta de la imagen (image_fila), la posicion incial (start_pos) que 
+        es utilizada para los soles que provienen de girasoles al igual que fpy que es 'final position y'.
+        Ademas toma como entradad el valor del girasol (value) y las dimensiones de la ventana (cols, rows,)
+        """
+        super(Suns, self).__init__()
+        non_dimmed = pygame.image.load(image_file).convert_alpha()
+        cw, ch = UT.cell_size()
+        self.image = pygame.transform.scale(non_dimmed, (ch*0.75, ch*0.75))
+        # Se incializa distinto para soles que caen del cielo y para los que provienen de girasoles
+        if fpy == None or start_pos == None:
+            final_pos = UT.cell_center(cols, rows, 'sun', None)
+            self.rect = self.image.get_rect(center=(final_pos[0], 0))
+            self.final_pos = (final_pos[0], final_pos[1])
+        else:
+            self.rect = self.image.get_rect(center=(start_pos))
+            self.final_pos = (start_pos[0], start_pos[1])
+
+        self.state = True
+        self.value = value
+        self.time = None
+    def action(self):
+        """
+        Metodo para las acciones del sol que son los siguientes:
+        1. Si el girasol llego a su posicion final, y luego pasan 10 segundos sin ser recogido desaparece
+        2. Si no llego a su posicion final, se mueve su posicon.
+        """
+        if self.rect.center == self.final_pos:
+            if self.time is None:
+                self.time = pygame.time.get_ticks()
+            elif pygame.time.get_ticks() - self.time >= 10000:
+                self.kill()
+            self.state = False
+        elif self.state:
+            self.rect.move_ip((0, 1))
+    def grab(self) -> int:
+        """
+        Metodo para agarrar el sol. Si es agarrado devuelve su value y es eliminado
+        """
+        self.kill()
+        return self.value
+
+class SF_sun(Suns):
+    """
+    Clase hija de Suns. Comparte todas sus mismas caracteristicas. Sin embargo, se 
+    distingue que esta clase es exclusiva para soles que provienen de girasoles. 
+    La inicializacion es identifca que para los soles del cielo pero ya se tiene
+    en cuenta su posicion inicial y final.
+    """
+    def __init__(self, image_file, start_pos, fpy, value=50):
+        super().__init__(image_file, start_pos, fpy, value)
+
+
