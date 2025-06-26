@@ -31,6 +31,8 @@ def Clasic():
     papapum_group = pygame.sprite.Group()
     boomerangs_group = pygame.sprite.Group()
     boomerangs_bullet_group = pygame.sprite.Group()
+    #* Grupos de las explosiones 
+    explosions_group = pygame.sprite.Group()
 
     #* Grupo de los soles
     soles_group = pygame.sprite.Group()
@@ -83,7 +85,7 @@ def Clasic():
         pygame.mixer.music.play(0)
         for k, v in database.items():
             if k != 'Normal' and k != 'flag':
-                if k == "balloon":
+                if k == "Balloon":
                     v['probability'] += 0.3
                 v['probability'] += 0.15
         if level == 1:
@@ -127,6 +129,12 @@ def Clasic():
             if event.type == pygame.QUIT:
                 run = False
             
+            # Vuelve al menú principal al apretar escape
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False 
+                    Main.main_menu()
+            
             # Si pierde se abre la pantalla de 'game over'
             elif event.type == GAME_OVER:               
                 GOM.show_game_over(screen)   
@@ -150,7 +158,7 @@ def Clasic():
 
                 # Se agrega zombi random
                 random_z = choices(list(database.keys()), weights=[k['probability'] for k in database.values()])[0]
-                if random_z == 'balloon':
+                if random_z == 'Balloon':
                     its_time_for_zombies = ZB.balloon(database[random_z], random_z)
                 else:
                     its_time_for_zombies = ZB.Zombies(database[random_z], random_z)
@@ -210,13 +218,15 @@ def Clasic():
         # Actualizamos la posicion de los guisantes
         GL.update_peas(peas_group, boomerangs_bullet_group, screen)
         # Actualizamos acciones de las plantas
-        GL.update_plants(get_all_plants(), zombies, peas_group, soles_group, boomerangs_bullet_group, screen)
+        GL.update_plants(get_all_plants(), zombies, peas_group, soles_group, boomerangs_bullet_group, explosions_group, screen)
         # Actualizamos acciones de los zombies
-        GL.udpate_zombies(zombies, get_all_plants(), peas_group, boomerangs_bullet_group, screen)
+        GL.update_zombies(zombies, get_all_plants(), peas_group, boomerangs_bullet_group, screen)
         # Actualizamos los soles
         GL.update_suns(soles_group, screen)
         # Actaulizamos las cosechadoras
         GL.update_lawnmowers(lawnmowers, zombies, screen)
+        # Actualizamos las explosiones
+        for explosion in explosions_group: explosion.update_screen_boom(screen)
         
         toolbar_group.update()  
         toolbar_group_ghost.draw(screen)

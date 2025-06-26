@@ -62,7 +62,7 @@ def papapum():
         pygame.mixer.music.play(0)
         for k, v in database.items():
             if k != 'Normal' and k != 'flag':
-                if k == "balloon":
+                if k == "Balloon":
                     v['probability'] += 0.3
                 v['probability'] += 0.15
         if level == 1:
@@ -83,6 +83,7 @@ def papapum():
     # Cálculos de tamaños para utilizarse luego
     _, cell_h = UT.cell_size()
     seed_size = (int(cell_h * 1.10), int(cell_h))
+    icon_size = (int(cell_h * 0.70), int(cell_h * 0.80))  # iconos "fantasma"
 
     # Zombies are coming efecto de sonido
     pygame.mixer.music.load(os.path.join("Audio", "The Zombies Are coming Sound Effect.mp3"))
@@ -95,7 +96,6 @@ def papapum():
         current_time = pygame.time.get_ticks()
         temp = (current_time - start_time) // 1000
         
-
         for event in events:
             # Mouse abierto o mouse cerrado
             if pygame.mouse.get_pressed()[0]:
@@ -105,6 +105,12 @@ def papapum():
             # Si cierra la ventana se cierra el juego
             if event.type == pygame.QUIT:
                 run = False
+
+            # Vuelve al menú principal al apretar escape
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False 
+                    Main.main_menu()
 
             # Si pierde se abre la pantalla de 'game over'
             elif event.type == GAME_OVER:               
@@ -132,9 +138,10 @@ def papapum():
             # Aparece una nuez en la cinta si se cumple el evento
             elif event.type == ADDNUT:
                 new_nut = TL.Delivery('NT_seedpacket.png', 'belt_nut_icon', (seed_size[0]-15, seed_size[1]-15))
-                new_ghost_nut = TL.Delivery_Ghost('Nut.png', 'belt_icon', (seed_size[0]-15, seed_size[1]-15))
-                nuts_toolbar_group.add(new_nut)
+                new_ghost_nut = TL.DraggingGhost(TL._load_scaled('Nut.png', icon_size), 'nut_icon')
+                
                 nuts_group_ghost.add(new_ghost_nut)
+                nuts_toolbar_group.add(new_nut)
 
             # Evento del mouse
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -162,16 +169,14 @@ def papapum():
                 
         
         
-        # SE ACTUALIZAN LOS OBJETOS
         # Dibujar grilla 10x6 dinámica
         GL.update_grid(10, 6, screen, marco, oscuro, claro)
+        # Actualizamos acciones de los zombies
+        GL.update_zombies_papum(nuts_group, zombies, screen)
         # Actualizamos acciones de las plantas
         belt_group.draw(screen)
         GL.update_nuts(nuts_toolbar_group,belt_group,nuts_group_ghost,nuts_group, screen, dragging)
-        # Actualizamos acciones de los zombies
-        GL.update_zombies_papum(nuts_group, zombies, screen)
         
-
         frames.tick(60)
         pygame.display.update()
 

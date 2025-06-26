@@ -4,7 +4,6 @@ import random
 import utils as UT
 from utils import GAME_OVER
 
-pygame.mixer.init()
 class Zombies(pygame.sprite.Sprite):
     """Zombi base utilizado en ambos modos de juego.
     Cada zombi se comporta como un sprite de Pygame que avanza de derecha
@@ -26,9 +25,6 @@ class Zombies(pygame.sprite.Sprite):
         self.id = random.randint(0, 100000)
         self.type = random_z
         self.start_time = pygame.time.get_ticks()
-        self.eating_sound = pygame.mixer.Sound(os.path.join('Audio', 'zombies eating sound.mp3'))
-        self.Channel = pygame.mixer.Channel(0)
-        self.eating = False
         
 
         raw = pygame.image.load(self.image).convert_alpha()
@@ -54,20 +50,12 @@ class Zombies(pygame.sprite.Sprite):
         """Aplica daño al zombi; lo elimina si la salud llega a 0.
 
         Entradas:
-            1. dmg (int, optional): Cantidad de daño a infligir.  
-                Default = 20.
+            1. dmg (int): Cantidad de daño a infligir.  
+                Default (daño de guisante) = 20.
         """
         self.health -= dmg
         if self.health <= 0:
             self.kill()
-    
-    def sound(self) -> None:
-        """Inicia o detiene el sonido de masticar según self.eating."""
-
-        if self.eating:
-            self.Channel.play(self.eating_sound, loops=-1)
-        else:
-            self.Channel.stop()
 
     def ready_to_hit(self)-> bool:
         """Determina si pasó suficiente tiempo para volver a atacar.
@@ -88,18 +76,19 @@ class balloon(Zombies):
     """Zombi con globo: flota y se mueve más rápido hasta que sufre daño."""
     def __init__(self, zombie_type, random_z):
         super().__init__(zombie_type, random_z)
+
     def balloon_ability(self):
         """Reduce la velocidad y cambia sprite al pincharse el globo.
 
-        Cuando la salud cae por debajo del 40 %:
+        Cuando la salud cae por debajo del 50 %:
         * se reduce la velocidad a 0.35 px/frame,
         * se reasigna el tipo a ``'Normal'``,
         * se cambia la imagen a “Balloonzombie2.png”.
         """
-        if self.health < self.max_health * 0.4:
+        if self.health < self.max_health * 0.5:
             self.speed = 0.35
             self.type = 'Normal'
-            self.image = os.path.join("Images","Balloonzombie2.png")
+            self.image = os.path.join("Images", self.zombie_type["image"][1])
             raw = pygame.image.load(self.image).convert_alpha()
             c_w, c_h = UT.cell_size()
             self.surf = pygame.transform.scale(raw, (int(c_h * 1.0), int(c_h * 0.9)))

@@ -61,24 +61,24 @@ def main_menu():
                                             os.path.join('Images', 'Mouse_click.png'))
     pygame.mouse.set_cursor(mouse_opened)
 
-    # fuentes (título más grande y grueso)
+    # Fuentes (título más grande y grueso)
     title_font = pygame.font.Font("04B_03__.TTF", 90)
     btn_font   = pygame.font.Font("04B_03__.TTF", 30)
 
-    # sonidos
+    # Sonidos
     pygame.mixer.music.load(os.path.join("Audio", "Main Menu - Plants vs. Zombies 2.mp3"))
     pygame.mixer.music.set_volume(1.0)
     pygame.mixer.music.play(-1)
 
     fullscreen = False
 
-    # textos precalculados
+    # Textos precalculados
     txt_play     = btn_font.render("Jugar",    True, (0, 0, 0))
     txt_papapum  = btn_font.render("Papapapapum",  True, (0, 0, 0))
     txt_full     = btn_font.render("Pantalla Completa", True, (0, 0, 0))
     txt_window   = btn_font.render("Modo Ventana",      True, (0, 0, 0))
 
-    # tamaños de botones
+    # Tamaños de botones
     btn_play_size    = (200, 60)
     btn_papapum_size = (350, 60)
     btn_toggle_size  = (300, 50)
@@ -111,6 +111,7 @@ def main_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if btn_play_rect.collidepoint(event.pos):
                     Clasic_mode.Clasic()
@@ -120,12 +121,12 @@ def main_menu():
                     fullscreen = not fullscreen
                     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) if fullscreen else pygame.display.set_mode(default_dims)
 
-        # ───── drawing ─────
+        # dibujo
         fondo = pygame.image.load(os.path.join('Images', 'pvz_udesa.png')).convert()
         fondo = pygame.transform.scale(fondo, (width, height))
         screen.blit(fondo, (0, 0))
 
-        # título con sombra destacada
+        # título con sombra de fondo
         title_white  = title_font.render("Plants vs Zombies", True, (255, 255, 255))
         title_shadow = title_font.render("Plants vs Zombies", True, (0, 0, 0))
         title_pos = title_white.get_rect(midtop=(width // 2, 80))

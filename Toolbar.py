@@ -3,6 +3,9 @@ import pygame
 import utils as UT
 
 
+#Cooldown de las plantas
+SEED_COOLDOWN = 5_000  
+
 class DraggingGhost(pygame.sprite.Sprite):
     """
     Objeto fantasma que sigue al cursor del mouse durante el arrastre.
@@ -17,20 +20,6 @@ class DraggingGhost(pygame.sprite.Sprite):
         self.key = key
 
 # ───────────────────────── Objects on toolbar's Clasic Mode ─────────────────────────
-
-# class DraggingGhost(pygame.sprite.Sprite):
-#     """
-#     Objeto fantasma que sigue al cursor del mouse durante el arrastre.
-#     La imagen se muestra semitransparente para indicar que es una vista previa.
-#     """
-#     def __init__(self, image: pygame.Surface, key: str):
-#         super().__init__()
-#         self.base_image = image 
-#         self.image = image.copy()
-#         self.image.set_alpha(128)  
-#         self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
-#         self.key = key
-
 
 class SelectableItem(pygame.sprite.Sprite):
     """
@@ -58,7 +47,7 @@ class SelectableItem(pygame.sprite.Sprite):
         """
         Inicia el cooldown del ítem, impidiendo su uso hasta que se cumpla el tiempo definido.
         """
-        self.cooldown_end = pygame.time.get_ticks() + UT.SEED_COOLDOWN
+        self.cooldown_end = pygame.time.get_ticks() + SEED_COOLDOWN
 
     def update(self):
         """
@@ -72,7 +61,7 @@ class SelectableItem(pygame.sprite.Sprite):
             
             now   = pygame.time.get_ticks()
             left  = self.cooldown_end - now        
-            ratio = left / UT.SEED_COOLDOWN         
+            ratio = left / SEED_COOLDOWN         
 
             self.image = self.base_image.copy()
 
@@ -80,7 +69,7 @@ class SelectableItem(pygame.sprite.Sprite):
             shade.fill((0, 0, 0, int(160 * ratio)))   
             self.image.blit(shade, (0, 0))
 
-# ───────────────────────── Objects on toolbar's Papapapum Mode  ─────────────────────────
+# ───────────────────────── Objetos del Toolbar en el modo Papapapum   ─────────────────────────
 
 class Delivery(pygame.sprite.Sprite):
     """
@@ -99,30 +88,19 @@ class Delivery(pygame.sprite.Sprite):
         """
         self.rect.x += self.speed
 
-class Delivery_Ghost(pygame.sprite.Sprite):
-    """
-    Objeto fantasma que sigue al cursor del mouse durante el arrastre.
-    La imagen se muestra semitransparente para indicar que es una vista previa.
-    """
-    def __init__(self, image, key, size):
-        super().__init__()
-        self.image = _load_scaled(image, size)
-        self.image.set_alpha(128)
-        self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
-        self.key = key
 
 def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
-    """Carga una imagen del directorio *Images* y la devuelve escalada.
-    Entradas
-    filename : str
-        Nombre del archivo de imagen (por ejemplo "Peashooter.png").
-    size : tuple[int, int]
-        Dimensiones finales del ``pygame.Surface`` en píxeles
-        *(ancho, alto)*.
-    Returns
-        pygame.Surface
-        Superficie de Pygame ya convertida con alpha y escalada al tamaño
-        solicitado."""
+    """
+    Carga una imagen y la devuelve escalada.
+    Entradas:
+        1. filename : str
+            Nombre del archivo de imagen (por ejemplo "Peashooter.png").
+        2. size : tuple[int, int]
+            Dimensiones finales del ``pygame.Surface`` en píxeles
+            (ancho, alto).
+    Returns: 
+        1. pygame.Surface: Imagen escalada al tamaño necesitado
+    """
     path = os.path.join("Images", filename)
     surf = pygame.image.load(path).convert_alpha()
     return pygame.transform.scale(surf, size)
@@ -130,23 +108,25 @@ def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
 
 def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
     """
-    Crea y devuelve los grupos de sprites de la barra de herramientas del modo clásico.
+    Crea y devuelve los grupos de sprites de la yoolbar del modo clásico.
 
     Returns:
         tuple[pygame.sprite.Group, pygame.sprite.Group]: 
-            - Grupo con ítems seleccionables (paquetes de semillas).
-            - Grupo con íconos fantasma para arrastrar al tablero.
+            - Grupo con ítems seleccionables (seed packets).
+            - Grupo con íconos fantasma.
     """
-    _ , cell_h = UT.cell_size()
 
+    # Tamaños necesarios para los cálculos
+    _ , cell_h = UT.cell_size()
     seed_size = (int(cell_h * 1.10), int(cell_h))       # paquetes
-    icon_size = (int(cell_h * 0.70), int(cell_h * 0.80))  # iconos "fantasma"
+    icon_size = (int(cell_h * 0.80), int(cell_h * 0.80))  # iconos "fantasma"
     counter_size = (int(cell_h * 2.25), int(cell_h * 1.50))
 
+    # Grupos de sprites
     toolbar_group = pygame.sprite.Group()
     toolbar_group_ghost = pygame.sprite.Group()
 
-
+    # Asignación de items
     for seed_file, key, icon_file in [
         ("SF_seedpacket.png", "sunflower_icon", "Sunflower.png"),
         ("PS_seedpacket.png", "peashooter_icon", "Peashooter.png"),
@@ -170,26 +150,26 @@ def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
 
 def special_delivery():
     """
-    Crea los grupos de sprites para el modo de cinta transportadora ('Papapapum').
+    Crea los grupos de sprites para el modo Papapapapum.
 
     Returns:
         tuple[pygame.sprite.Group, pygame.sprite.Group, pygame.sprite.Group]:
             - Grupo de la cinta transportadora.
-            - Grupo con ítems (semillas) que aparecen en la cinta.
-            - Grupo con íconos fantasma para previsualizar la colocación.
+            - Grupo con las nueces (seed packets) que aparecen en la cinta.
+            - Grupo con íconos fantasma.
     """
+    # Tamaños necesarios para los cálculos
     _, cell_h = UT.cell_size()
     seed_size = (int(cell_h * 1.10), int(cell_h))
-    icon_size = (int(cell_h * 0.70), int(cell_h * 0.80))  # iconos "fantasma"
+    icon_size = (int(cell_h * 0.8), int(cell_h * 0.8))  # iconos "fantasma"
     belt_size = (int(cell_h * 20), int(cell_h - 5))
     
     belt_group = pygame.sprite.Group()
-    belt_group.add(Delivery('belt.png', 'belt_icon', belt_size))
-    
     nuts_toolbar_group = pygame.sprite.Group()
-    nuts_toolbar_group.add(Delivery('NT_seedpacket.png', 'belt_nut_icon', (seed_size[0]-20, seed_size[1]-20)))
-    
     nuts_group_ghost = pygame.sprite.Group()
+
+    belt_group.add(Delivery('belt.png', 'belt_icon', belt_size))
+    nuts_toolbar_group.add(Delivery('NT_seedpacket.png', 'belt_nut_icon', (seed_size[0]-20, seed_size[1]-20)))
     
     icon_img = _load_scaled('Nut.png', icon_size)
     nuts_group_ghost.add(DraggingGhost(icon_img, 'nut_icon'))

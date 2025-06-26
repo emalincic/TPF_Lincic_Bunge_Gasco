@@ -11,19 +11,19 @@
         "image": ["mati_zomcaccia.png"],
         "probability": 0.4
     },
-    "bucket": {
+    "Bucket": {
         "health": 1290,
         "speed": 0.35,
         "image": ["zombie_bucket.png"],
         "probability": 0.3
     },
-    "balloon": {
+    "Balloon": {
         "health": 900,
         "speed": 0.5,
         "image": ["Balloonzombie.png", "Balloonzombie2.png"],
-        "probability": 1
+        "probability": 0.1
     },
-    "flag" : {
+    "Flag" : {
         "health": 190,
         "speed": 0.35,
         "image": ["zombie_flag.png"],

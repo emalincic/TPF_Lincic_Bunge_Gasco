@@ -1,12 +1,9 @@
 import pygame
 from random import randint
 
-
-#! TEMA COOLDOWNS
-# COLS, ROWS = 10, 6
-#! ESTO PORQUE ESTA ACA?
+#Evento de game over que se usa en multiples modos de juego
 GAME_OVER = pygame.USEREVENT + 4
-SEED_COOLDOWN = 5_000  
+
 
 def cell_size(COLS=10, ROWS=6) -> tuple:
     """
@@ -14,6 +11,9 @@ def cell_size(COLS=10, ROWS=6) -> tuple:
     Entradas:
         1. COLS (int): numero de columnas
         2. ROWS (int): numero de filas
+    Returns:
+        1. w // COLS (int): Tamaño ajustado según el tamaño del display (Ancho)
+        2. h // ROWS  (int): Tamaño ajustado según el tamaño del display (alto)
     """
     surface = pygame.display.get_surface()
     if surface is None:        
@@ -34,23 +34,22 @@ def mouses(mouse_open: str, mouse_clicked: str) -> pygame.cursors.Cursor:
         1. mouse_opened (pygame.cursors.Cursor): objeto de la clase cursors.Cursor
         2. mouse_pressed (pygame.cursors.Cursor): objeto de la clase cursors.Cursor
     """
-    cursor_opended = pygame.image.load(mouse_open).convert_alpha()
-    cursor_opended = pygame.transform.scale(cursor_opended, (40, 40))
+    cursor_opened = pygame.image.load(mouse_open).convert_alpha()
+    cursor_opened = pygame.transform.scale(cursor_opened, (40, 40))
 
     cursor_pressed = pygame.image.load(mouse_clicked).convert_alpha()
     cursor_pressed = pygame.transform.scale(cursor_pressed, (40, 40))
 
-    mouse_opened = pygame.cursors.Cursor((0, 0), cursor_opended)
+    mouse_opened = pygame.cursors.Cursor((0, 0), cursor_opened)
     mouse_pressed = pygame.cursors.Cursor((0, 0), cursor_pressed)
-    print(type(mouse_opened))
     return mouse_opened, mouse_pressed
 
 # Partes del fondo
 def background_squares(screen: pygame.surface.Surface, cols: int, rows: int, image_banner: str, 
-                       image_light_square: str, image_dark_square: str) -> pygame.surface.Surface:
+                        image_light_square: str, image_dark_square: str) -> pygame.surface.Surface:
     """
     Funcion destinada a transformar las imagenes para las celdas claras, oscuras y el marco (parte superior).
-    Se dimensionan las celdas acorde a las dimensiones de la pantalla. Se retoran las superficies para los
+    Se dimensionan las celdas acorde a las dimensiones de la pantalla. Se retornan las superficies para los
     3 tipos de celdas.
     Entradas:
         1. screen (pygame.surface.Surface): pantalla del usuario
@@ -61,8 +60,8 @@ def background_squares(screen: pygame.surface.Surface, cols: int, rows: int, ima
         6. image_dark_square (str): ruta de la imagen de la celda oscura
     Returns:
         1. scaled_banner (pygame.surface.Surface): superficie del marco
-        2. scaled_light_square (pygame.surface.Surface): superficie de la celda clara
-        3. scaled_dark_square (pygame.surface.Surface): superficie de la celdas oscuras  
+        2. scaled_light_square (pygame.surface.Surface): superficie de las celdas claras
+        3. scaled_dark_square (pygame.surface.Surface): superficie de las celdas oscuras  
     """
     width, height = screen.get_size()    # ancho y alto actuales
     cell_width  = width  // cols    # dimensiones de cada celda
@@ -81,13 +80,13 @@ def background_squares(screen: pygame.surface.Surface, cols: int, rows: int, ima
 # Funcion para el poscionamiento de los objetos (funcion universal)
 def cell_center(cols: int, rows: int, key: str, pos=None):
     """
-    Funcion universal para el correcto poscionamiento de los objetos en las celdas. La funcion toma
+    Funcion universal para el correcto posicionamiento de los objetos en las celdas. La funcion toma
     las columnas y filas de la pantalla. Ademas toma una key dependiendo de que se este posicionando.
-    Escencialmente la funcion busca centrar los elementos en su celda correspondiente. 
+    Esencialmente la funcion busca centrar los elementos en su celda correspondiente. 
     La siguiente es una lista de las keys y su uso de la variable pos
         1. plant - pos es una tupla con las coordenadas de la celda donde se quiere posicionar una planta
         2. sun - None
-        3. lawnmower - pos es la fila a la cual pertence la podadora
+        3. lawnmower - pos es la fila a la cual pertenece la podadora
         4. zombi - None
         5. shovel_icon - None
         6. sunflower_icon - None
@@ -99,7 +98,7 @@ def cell_center(cols: int, rows: int, key: str, pos=None):
         12. suncounter_icon - None
         13. cherry_range - tupla con las coordenadas del centro de una celda en la que fue posicionada 
                             una planta cereza
-        14. boomerang_range - coordenada correspondiente al eje 'y' al que pertence el proyectil
+        14. boomerang_range - coordenada correspondiente al eje 'y' al que pertenece el proyectil
         15. belt_icon - None
         16. belt_nut_icon - None
     Entradas:
@@ -110,6 +109,7 @@ def cell_center(cols: int, rows: int, key: str, pos=None):
     Returns:
         Varia segun key, suele referirse a coordenadas centradas aunque puede variar
     """
+    
     # ← llamamos cada vez
     cell_width, cell_height = cell_size()
     if key == 'plant': 

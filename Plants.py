@@ -1,7 +1,6 @@
 import pygame
 import utils as UT
 import os
-pygame.mixer.init()
 
 # ────────────────────────── Plantas ────────────────────────── 
 class Plants(pygame.sprite.Sprite):
@@ -37,7 +36,7 @@ class Plants(pygame.sprite.Sprite):
     def remove(self) -> int:
         """
         Funcion a traves de la cual la planta puede ser removida por el usuario.
-        Complemente el uso de la pala.
+        Complementa el uso de la pala.
         retorna el 50% del costo
         """
         self.kill()
@@ -47,7 +46,7 @@ class Plants(pygame.sprite.Sprite):
 class Sunflower(Plants):
     """
     Clase de los girasoles (clase hija de Plants). Su habilidad es cada 10 segundos devolver soles
-    para que el usuario aumente su contador. Su funcion que ejectua la habilidad es ability().
+    para que el usuario aumente su contador. Su funcion que ejecuta la habilidad es ability().
     """
     def __init__(self, image_file: str, pos: tuple, cost: int=50, life: int=300):
         """
@@ -95,7 +94,7 @@ class Nut(Plants):
 class Boomerang(Plants):
     """
     Clase de las plantas Boomerang (clase hija de Plants). Su habilidad es tirar un proyectil (un boomerang) que
-    vuelve hacia la planta luego de llegar hasta el final de la grilla. A los zombis en su trayecto les diminuye
+    vuelve hacia la planta luego de llegar hasta el final de la grilla. A los zombis en su trayecto les disminuye
     vida. Su habilidad se ejecuta en ability().
     """
     def __init__(self, image_file: str, pos: tuple, boomerang_file: str, cost: int=175, life: int=300):
@@ -134,7 +133,7 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
     """
     def __init__(self, image_file: str, pos: tuple):
         """
-        Se reciben como entradas la ruta de la imagen (image_file) y la posicion del centro del obeto (pos).
+        Se reciben como entradas la ruta de la imagen (image_file) y la posicion del centro del objeto (pos).
         """
         super().__init__()
         cw, ch = UT.cell_size()
@@ -142,7 +141,7 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
         size = int(ch * 0.4)
         self.image = pygame.transform.scale(raw, (size, size)) # Se ajustan las dimensiones del objeto a la ventana
         self.x, self.y = pos
-        self.rect = self.image.get_rect(center=(self.x, self.y)) # Se define el rect del objeto y su posicon
+        self.rect = self.image.get_rect(center=(self.x, self.y)) # Se define el rect del objeto y su posicion
         self.speed = max(4, cw // 20) #! PARA QUE SE USA ESTO?
         self.original = pos         
         self.final = UT.cell_center(10, 6, 'boomerang_range', self.original[1])         # Definimos rango del proyectil
@@ -150,9 +149,10 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
         self.foward = True
         self.backward = False
         self.already_hit_zombies = [] # Se guarda una identificacion de los zombies que ya golpeo
+
     def shoot(self):
         """
-        Habilidad propia del proyectil. Hace que avance su posicon hasta llegar a su rango final.
+        Habilidad propia del proyectil. Hace que avance su posicion hasta llegar a su rango final.
         Cuando llega al final, comienza a volver hacia la planta, listo para volver a golpear a 
         los zombis en la fila.
         """
@@ -184,9 +184,7 @@ class PeaShotter(Plants):
         """
         super().__init__(image_file, pos, cost, life)
         self.pea_file = pea_file
-        self.shooting_sound = pygame.mixer.Sound(os.path.join('Audio', 'zombies eating sound.mp3'))
-        self.Channel = pygame.mixer.Channel(1)
-        self.shooting = False
+
     def ability(self, zombies: pygame.sprite.Group) -> tuple:
         """
         Clase para la habilidad del Lanzaguisante. Dispara un proyectil que recorre la fila, hasta
@@ -223,7 +221,7 @@ class Pea(pygame.sprite.Sprite):
         self.speed = max(4, cw // 20)
     def shoot(self):
         """
-        Metodo que avanca la posicion del guisante
+        Metodo que avanza la posicion del guisante
         """
         self.rect.x += self.speed
 
@@ -233,13 +231,16 @@ class cherry(Plants):
     Clase de la planta Cereza (clase hija de Plants). Su habilidad es explotar y eliminar a los zombis
     en un range 3x3 a su alrededor. Su funcion se ejecuta en ability().
     """
-    def __init__(self, image_file: str, pos: tuple, cost: int=200, life: int=10):
+    def __init__(self, image_file: str, pos: tuple, explosion_file: str, cost: int=200, life: int=10):
         """
         Se toman como entradas: la ruta de la imagen (image_file), la posicion del centro 
-        del objeto (pos), la ruta de la imagen de su proyectil (pea_file), el costo de la planta y su vida.
-        La inicializacion es casi identica que para la clase padre Plants.       
+        del objeto (pos), la ruta de la imagen de su explosion (explosion_file), el costo de la planta y su vida.
+        La inicializacion es casi identica que para la clase padre Plants con la 
+        diferencia de que se pide la ruta de la imagen de la explosion.       
         """
         super().__init__(image_file, pos, cost, life)
+        self.explosion_file = explosion_file
+
     def ability(self, zombies: pygame.sprite.Group) -> tuple:
         """
         Clase para la habilidad de la cereza. Al ser ubicada explota inmediatamente matando
@@ -251,8 +252,9 @@ class cherry(Plants):
         for zombie in zombies:
             if explosion_range.colliderect(zombie.rect): # Si un zombi se encuentra en el rango muere
                 zombie.kill()
+        explosion = plant_boom(self.explosion_file, self.pos, scale=3)
         self.kill() # Se elimina la planta luego de explotar
-        return None, None
+        return explosion, 'cherry'
 
 # 6. Papapum
 class Papapum(Plants):
@@ -260,24 +262,28 @@ class Papapum(Plants):
     Clase del Papapum (clase hija de Plants). Su habilidad es explotar cuando un zombi
     lo pisa. Pero primero debe cargarse. Su funcion se ejecuta en ability().
     """
-    def __init__(self, image_file_loading: str, image_file_ready: str, pos: tuple, cost: int=200, life: int=50):
+    def __init__(self, image_file_loading: str, image_file_ready: str, explosion_file: str, pos: tuple, cost: int=200, life: int=50):
         """
         Se toman como entradas: la ruta de la imagen del papapum bajo tierra (image_file_loading), la ruta de la imagen
-        del papaum listo para explotar (image_file_ready), la posicion del centro 
+        del papaum listo para explotar (image_file_ready), la ruta de la imagen de su explosion (explosion_file) la posicion del centro 
         del objeto (pos), la ruta de la imagen de su proyectil (pea_file), el costo de la planta y su vida.
         La inicializacion es casi identica que para la clase padre Plants con la unica diferencia 
-        que se tiene en cuenta la nocion de que las planta esta lista o no para explotar.       
+        que se tiene en cuenta la nocion de que las planta esta lista o no para explotar, y que se carga el archivo de
+        su explosion.       
         """
         super().__init__(image_file_loading, pos, cost, life)
         self.image_file_ready = image_file_ready
         self.transformed = False # Se setea en falso que este transformado
+        self.explosion_file = explosion_file
+
     def ability(self, zombies: pygame.sprite.Group) -> tuple:
         """
         Clase para la habilidad del papaum. Comienza el timer para transformarse cuando primero se 
-        ejectua la funcion. Luego de 10 segundos se transforma y se activa su habilidad 
+        ejecuta la funcion. Luego de 10 segundos se transforma y se activa su habilidad 
         que es que si algun zombi lo pisa muere instantaneamente. La salida es una tupla con ambos 
         elementos siendo None pues no es necesaria identificar su habilidad en el gameloop.     
         """
+        explosion = (None, None) # Si el papapum no explota
         if self.ready is None:
             self.ready = pygame.time.get_ticks()
         elif pygame.time.get_ticks() - self.ready >= 10000: # luego de 10 segundos es transformado
@@ -292,10 +298,11 @@ class Papapum(Plants):
                 self.life = 1000
             for zombie in zombies:
                 # Si un zombi lo pisa se muere, excepto el zombi del globo.
-                if self.rect.collidepoint(zombie.rect.center) and zombie.type != 'balloon':
+                if self.rect.collidepoint(zombie.rect.center) and zombie.type != 'Balloon':
                     zombie.kill() 
+                    explosion = (plant_boom(self.explosion_file, self.pos), 'papapum') # Si el papapum explota
                     self.kill()
-        return None, None
+        return explosion
     
 # 7. Papa Giratoria (propia del modo especial)
 class Spinning_Nut(Plants):
@@ -316,11 +323,12 @@ class Spinning_Nut(Plants):
         self.rect = self.image.get_rect(midright=pos)
         self.pos = pygame.Vector2(self.rect.center)  # posición flotante precisa
         
+        self.already_hit_zombies = [] # Se guarda una identificacion de los zombies que ya golpeo
         self.already_hit = False
 
     def ability(self):
         """
-        Clase para la habilidad de la Nuez giratoria. Cada vez que se llama avanca a la Nuez.
+        Clase para la habilidad de la Nuez giratoria. Cada vez que se llama avanza la Nuez.
         Cuando llega al final del trayecto es eliminada.   
         """
         self.speed = 7
@@ -332,14 +340,48 @@ class Spinning_Nut(Plants):
         self.rect = self.image.get_rect(center=self.pos)  # usar pos exacta como centro
 
         screen_w = pygame.display.get_surface().get_width()
-        if self.rect.left >= screen_w:
+        if self.rect.left >= screen_w: # La nuez se elimina cuando exede el borde de la pantalla 
             self.kill()
             
+# Extra: clase de las explosiones
+class plant_boom(pygame.sprite.Sprite):
+    """
+    Clase dedicada a las imagenes de las explosiones de las plantas (cherry y papaum). Hija de la
+    clase sprite.Sprite de pygame. Para incizializar se pide la ruta de la imagen (image_file), la 
+    posicion de la explosion (pos), el tiempo en pantalla de la explosion (time_in_screen) y un 
+    factor para el area de la explosion (scale). El metodo update_screen_boom() actualiza la pantalla.
+    """
+    def __init__(self, image_file: str, pos: tuple, time_in_screen: int = 2000, scale: float = 1):
+        """
+        Se toman como entradas la ruta de la imagen (image_file), la posicion de la explosion (pos) 
+        y el tiempo en pantalla de la explosion (time_in_screen). Ademas se toma la entrada scale
+        para poder decidir el area de la explosion.
+        """
+        super().__init__()
+        cw, ch = UT.cell_size()
+        raw = pygame.image.load(image_file).convert_alpha()
+        self.image = pygame.transform.scale(raw, (int(cw*scale), int(ch*scale)))
+        self.pos = pos
+
+        self.rect = self.image.get_rect(center=pos)  
+        self.time_in_screen = time_in_screen 
+        self.start_time = pygame.time.get_ticks()     
+    def update_screen_boom(self, screen: pygame.surface.Surface):
+        """
+        Metodo utilizado para actualizar la pantalla segun la duracion de la explosion.
+        Toma como entrada screen (pygame.surface.Surface) que es la pantalla del usuario
+        a ser actualizada.
+        """
+        # Si el tiempo desde que exploto no supera su tiempo en pantalla se actualiza
+        if pygame.time.get_ticks() - self.start_time < self.time_in_screen:
+            screen.blit(self.image, self.rect)
+        else: self.kill() 
+
 # ────────────────────────── Podadora ──────────────────────────
 class Lawnmower(pygame.sprite.Sprite):
     """
     Clase de las Podadoras (hija de la clase sprite.Sprite de pygame). Se activa cuando un zombi entra 
-    en contacto con ella y avanza hasta salir de pantalla. Su movimiento se ejectua a traves del 
+    en contacto con ella y avanza hasta salir de pantalla. Su movimiento se ejecuta a traves del 
     metodo movement()
     """
 
@@ -392,15 +434,15 @@ class Suns(pygame.sprite.Sprite):
     """
     def __init__(self, image_file: str, start_pos = None, fpy = None, value=50, cols = 10, rows = 6):
         """
-        Se toman como entradas la ruta de la imagen (image_fila), la posicion incial (start_pos) que 
+        Se toman como entradas la ruta de la imagen (image_file), la posicion incial (start_pos) que 
         es utilizada para los soles que provienen de girasoles al igual que fpy que es 'final position y'.
-        Ademas toma como entradad el valor del girasol (value) y las dimensiones de la ventana (cols, rows,)
+        Ademas toma como entrada el valor del girasol (value) y las dimensiones de la ventana (cols, rows,)
         """
         super(Suns, self).__init__()
         non_dimmed = pygame.image.load(image_file).convert_alpha()
         cw, ch = UT.cell_size()
         self.image = pygame.transform.scale(non_dimmed, (ch*0.75, ch*0.75))
-        # Se incializa distinto para soles que caen del cielo y para los que provienen de girasoles
+        # Se inicializa distinto para soles que caen del cielo y para los que provienen de girasoles
         if fpy == None or start_pos == None:
             final_pos = UT.cell_center(cols, rows, 'sun', None)
             self.rect = self.image.get_rect(center=(final_pos[0], 0))
@@ -416,7 +458,7 @@ class Suns(pygame.sprite.Sprite):
         """
         Metodo para las acciones del sol que son los siguientes:
         1. Si el girasol llego a su posicion final, y luego pasan 10 segundos sin ser recogido desaparece
-        2. Si no llego a su posicion final, se mueve su posicon.
+        2. Si no llego a su posicion final, se mueve su posicion.
         """
         if self.rect.center == self.final_pos:
             if self.time is None:
