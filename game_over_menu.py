@@ -13,8 +13,9 @@ def show_game_over(screen: pygame.Surface) -> bool:
         encadenar lógica (p. ej. reiniciar el juego) si se desea.
         """
     #Tamaño de fuentes 
-    font_big = pygame.font.Font("04B_03__.TTF", 120)
-    font_small = pygame.font.Font("04B_03__.TTF", 40)
+    font = os.path.join("Fonts", "04B_03__.TTF")
+    font_big = pygame.font.Font(font, 120)
+    font_small = pygame.font.Font(font, 40)
     #Se renderizan las palabras
     text_title  = font_big.render("PERDISTE", True, (250, 30, 30))
     text_hint   = font_small.render("Presiona cualquier tecla", True, (255, 255, 255))

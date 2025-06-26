@@ -62,8 +62,9 @@ def main_menu():
     pygame.mouse.set_cursor(mouse_opened)
 
     # Fuentes (título más grande y grueso)
-    title_font = pygame.font.Font("04B_03__.TTF", 90)
-    btn_font   = pygame.font.Font("04B_03__.TTF", 30)
+    font = os.path.join("Fonts", "04B_03__.TTF")
+    title_font = pygame.font.Font(font, 90)
+    btn_font   = pygame.font.Font(font, 30)
 
     # Sonidos
     pygame.mixer.music.load(os.path.join("Audio", "Main Menu - Plants vs. Zombies 2.mp3"))

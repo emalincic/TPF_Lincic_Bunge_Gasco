@@ -105,8 +105,8 @@ def Clasic():
     pygame.mixer.music.play(0)
 
     # Características del contador
-    font = pygame.font.Font("04B_03__.TTF", 35) 
-    sun_counter = 5000
+    font = pygame.font.Font(os.path.join("Fonts", "04B_03__.TTF"), 35) 
+    sun_counter = 50
 
     # Gestión de atributos
     wave_level = 1
