@@ -142,7 +142,7 @@ class Boomerang_Bullet(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(raw, (size, size)) # Se ajustan las dimensiones del objeto a la ventana
         self.x, self.y = pos
         self.rect = self.image.get_rect(center=(self.x, self.y)) # Se define el rect del objeto y su posicion
-        self.speed = max(4, cw // 20) #! PARA QUE SE USA ESTO?
+        self.speed = max(4, cw // 20)
         self.original = pos         
         self.final = UT.cell_center(10, 6, 'boomerang_range', self.original[1])         # Definimos rango del proyectil
         # Estados para ver si avanza o retrocede

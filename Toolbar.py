@@ -108,7 +108,7 @@ def _load_scaled(filename: str, size: tuple[int, int]) -> pygame.Surface:
 
 def toolbar() -> tuple[pygame.sprite.Group, pygame.sprite.Group]:
     """
-    Crea y devuelve los grupos de sprites de la yoolbar del modo clásico.
+    Crea y devuelve los grupos de sprites de la toolbar del modo clásico.
 
     Returns:
         tuple[pygame.sprite.Group, pygame.sprite.Group]: 
