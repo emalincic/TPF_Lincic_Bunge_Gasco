@@ -79,7 +79,7 @@ def Clasic():
             2. database (dict): Diccionario de la base de datos.
         Returns: -
         """
-        flag = ZB.Zombies(database['flag'], 'flag')
+        flag = ZB.Zombies(database['Flag'], 'flag')
         zombies.add(flag)
         pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
         pygame.mixer.music.play(0)
@@ -214,7 +214,7 @@ def Clasic():
 
         # ACTUALIZACIÓN DE OBJETOS
         # Dibujar grilla 10x6 dinámica
-        GL.update_grid(10, 6, screen, marco, oscuro, claro)
+        GL.update_grid(10, 6, screen, marco, oscuro, claro, 1)
         # Actualizamos la posicion de los guisantes
         GL.update_peas(peas_group, boomerangs_bullet_group, screen)
         # Actualizamos acciones de las plantas
@@ -225,6 +225,8 @@ def Clasic():
         GL.update_suns(soles_group, screen)
         # Actaulizamos las cosechadoras
         GL.update_lawnmowers(lawnmowers, zombies, screen)
+        # Dibujar marco
+        GL.update_grid(10, 1, screen, marco, oscuro, claro)
         # Actualizamos las explosiones
         for explosion in explosions_group: explosion.update_screen_boom(screen)
         

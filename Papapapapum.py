@@ -56,7 +56,7 @@ def papapum():
             2. database (dict): Diccionario de la base de datos.
         Returns: -
         """
-        flag = ZB.Zombies(database['flag'], 'flag')
+        flag = ZB.Zombies(database['Flag'], 'flag')
         zombies.add(flag)
         pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
         pygame.mixer.music.play(0)
