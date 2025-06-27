@@ -307,7 +307,7 @@ def update_zombies_papum(nuts_group: pygame.sprite.Group, zombies_group: pygame.
                 nut.already_hit_zombies.append(zombie.id)  
                 zombie.selfdamage(500)
 
-def nut_placement(placement: tuple, nuts_group: pygame.sprite.Group, nuts_toolbar_group: pygame.sprite.Group):
+def nut_placement(placement: tuple, nuts_group: pygame.sprite.Group, nuts_toolbar_group: pygame.sprite.Group, tag):
     """
     Funcion designada a ubicar las Nueces del modo papapapum. Si placement es None (Nuez ubicada en lugar no permitido),
     no se logra posicionar. En caso de ser una tupla con coordenads se agrega al pygame group de las Nueces una nueva
@@ -319,6 +319,6 @@ def nut_placement(placement: tuple, nuts_group: pygame.sprite.Group, nuts_toolba
 
     # Se eliminan Nueces puestas
     for nuts in nuts_toolbar_group:
-        if placement:
+        if placement and nuts.id == tag:
             nuts.kill()
             break

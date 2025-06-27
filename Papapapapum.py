@@ -149,6 +149,7 @@ def papapum():
                 for (nut, nut_ghost) in zip(nuts_toolbar_group,nuts_group_ghost):
                     if nut.rect.collidepoint(event.pos):
                         dragging = nut_ghost
+                        tag = nut.id
                         dragging.speed = 0
                         original_pos = dragging.rect.center
 
@@ -158,7 +159,7 @@ def papapum():
                 pos = pygame.mouse.get_pos()
                 placement = UT.cell_center(10, 6, 'plant', pos)
                 if placement:
-                    GL.nut_placement(placement, nuts_group, nuts_toolbar_group)
+                    GL.nut_placement(placement, nuts_group, nuts_toolbar_group, tag)
                     dragging.rect.center = original_pos
                     dragging.kill()
                 dragging = None

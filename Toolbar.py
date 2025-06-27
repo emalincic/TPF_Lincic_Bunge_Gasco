@@ -1,4 +1,5 @@
 import os
+import random
 import pygame
 import utils as UT
 
@@ -81,6 +82,7 @@ class Delivery(pygame.sprite.Sprite):
         self.image = _load_scaled(image, size)
         self.rect = self.image.get_rect(center=UT.cell_center(10, 6, key))
         self.key = key
+        self.id = random.randint(0, 100)
         
     def item_in_belt(self):
         """
