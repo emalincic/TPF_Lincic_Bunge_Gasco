@@ -84,7 +84,7 @@ def Clasic():
         pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
         pygame.mixer.music.play(0)
         for k, v in database.items():
-            if k != 'Normal' and k != 'flag':
+            if k != 'Normal' and k != 'Flag':
                 if k == "Balloon":
                     v['probability'] += 0.3
                 v['probability'] += 0.15
