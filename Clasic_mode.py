@@ -101,7 +101,7 @@ def Clasic():
     pygame.mouse.set_cursor(mouse_opened)
 
     # Llamada de los zombis incial 
-    pygame.mixer.music.load('Audio\The Zombies Are coming Sound Effect.mp3')
+    pygame.mixer.music.load(os.path.join('Audio', 'The Zombies Are coming Sound Effect.mp3'))
     pygame.mixer.music.play(0)
 
     # Características del contador
